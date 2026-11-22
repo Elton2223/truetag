@@ -1,0 +1,60 @@
+---
+import AppShell from '../../../layouts/AppShell.astro';
+import { query, type Row } from '../../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const id = Astro.params.id!;
+
+const brands = await query<Row[]>(`SELECT * FROM brands WHERE id = :id`, { id });
+const brand = brands[0];
+if (!brand) return Astro.redirect('/admin/brands?err=Not+found');
+
+const products = await query<Row[]>(
+  `SELECT p.*, (SELECT COUNT(*) FROM batches b WHERE b.product_id = p.id) AS batches
+   FROM products p WHERE brand_id = :id ORDER BY created_at DESC`,
+  { id },
+);
+const flash = Astro.url.searchParams.get('ok');
+---
+<AppShell title={brand.name} area="admin" userName={user.name}>
+  <p><a href="/admin/brands">← Brands</a></p>
+  <h1>{brand.name}</h1>
+  <p><span class={`pill ${brand.status === 'verified' ? 'ok' : 'warn'}`}>{brand.status}</span>
+    {brand.reg_number && <span class="muted"> · {brand.reg_number}</span>}
+  </p>
+  {flash && <div class="flash">Saved.</div>}
+
+  <h2>Add product</h2>
+  <form class="stack-form card" method="post" action="/api/v1/admin/products">
+    <input type="hidden" name="brand_id" value={brand.id} />
+    <label>Name<input name="name" required /></label>
+    <label>Category
+      <select name="category">
+        <option value="alcohol">alcohol</option>
+        <option value="tobacco">tobacco</option>
+        <option value="other">other</option>
+      </select>
+    </label>
+    <label>SKU<input name="sku" /></label>
+    <button class="btn" type="submit">Add product</button>
+  </form>
+
+  <h2 style="margin-top:2rem">Products</h2>
+  {products.length === 0 ? <p class="muted">No products yet.</p> : (
+    <table class="data">
+      <thead><tr><th>Name</th><th>Category</th><th>SKU</th><th>Batches</th><th></th></tr></thead>
+      <tbody>
+        {products.map((p) => (
+          <tr>
+            <td>{p.name}</td>
+            <td>{p.category}</td>
+            <td>{p.sku || '—'}</td>
+            <td>{p.batches}</td>
+            <td><a href={`/admin/products/${p.id}`}>Open</a></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</AppShell>

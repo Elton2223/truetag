@@ -1,0 +1,35 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+import { formatWhen } from '../../lib/format';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const brandId = user.brandId!;
+
+const reports = await query<Row[]>(
+  `SELECT r.*, c.code AS linked_code
+   FROM consumer_reports r
+   LEFT JOIN codes c ON c.id = r.code_id
+   WHERE r.brand_id = :brandId
+   ORDER BY r.created_at DESC LIMIT 100`,
+  { brandId },
+);
+---
+<AppShell title="Reports" area="portal" userName={user.name}>
+  <h1>Consumer reports</h1>
+  <table class="data">
+    <thead><tr><th>When</th><th>Code</th><th>City</th><th>Message</th><th>Status</th></tr></thead>
+    <tbody>
+      {reports.map((r) => (
+        <tr>
+          <td>{formatWhen(r.created_at)}</td>
+          <td><code>{r.linked_code || r.code_text || '—'}</code></td>
+          <td>{r.city_approx || '—'}</td>
+          <td>{r.message}</td>
+          <td>{r.status}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

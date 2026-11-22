@@ -1,0 +1,45 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const brandId = user.brandId!;
+const flash = Astro.url.searchParams.get('ok');
+
+const products = await query<Row[]>(
+  `SELECT p.*, (SELECT COUNT(*) FROM batches b WHERE b.product_id = p.id) AS batches
+   FROM products p WHERE brand_id = :brandId ORDER BY created_at DESC`,
+  { brandId },
+);
+---
+<AppShell title="Products" area="portal" userName={user.name}>
+  <h1>Products</h1>
+  {flash && <div class="flash">Saved.</div>}
+  <form class="stack-form card" method="post" action="/api/v1/brands/me/products">
+    <label>Name<input name="name" required /></label>
+    <label>Category
+      <select name="category">
+        <option value="alcohol">alcohol</option>
+        <option value="tobacco">tobacco</option>
+        <option value="other">other</option>
+      </select>
+    </label>
+    <label>SKU<input name="sku" /></label>
+    <button class="btn" type="submit">Add product</button>
+  </form>
+  <h2 style="margin-top:2rem">Your catalogue</h2>
+  <table class="data">
+    <thead><tr><th>Name</th><th>Category</th><th>Batches</th><th></th></tr></thead>
+    <tbody>
+      {products.map((p) => (
+        <tr>
+          <td>{p.name}</td>
+          <td>{p.category}</td>
+          <td>{p.batches}</td>
+          <td><a href={`/portal/products/${p.id}`}>Open</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

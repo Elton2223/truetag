@@ -1,0 +1,62 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const brandId = user.brandId!;
+
+const brand = (await query<Row[]>(`SELECT name FROM brands WHERE id = :id`, { id: brandId }))[0];
+const monthStart = new Date();
+monthStart.setDate(1);
+monthStart.setHours(0, 0, 0, 0);
+
+const [scans, genuine, suspicious, reports, codes] = await Promise.all([
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM scan_events s
+     JOIN codes c ON c.id = s.code_id JOIN batches b ON b.id = c.batch_id JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId AND s.created_at >= :from`,
+    { brandId, from: monthStart },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM scan_events s
+     JOIN codes c ON c.id = s.code_id JOIN batches b ON b.id = c.batch_id JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId AND s.verdict = 'genuine' AND s.created_at >= :from`,
+    { brandId, from: monthStart },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM scan_events s
+     JOIN codes c ON c.id = s.code_id JOIN batches b ON b.id = c.batch_id JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId AND s.verdict = 'suspicious' AND s.created_at >= :from`,
+    { brandId, from: monthStart },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM consumer_reports WHERE brand_id = :brandId AND created_at >= :from`,
+    { brandId, from: monthStart },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM codes c JOIN batches b ON b.id = c.batch_id JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId AND c.created_at >= :from`,
+    { brandId, from: monthStart },
+  ),
+]);
+
+const label = monthStart.toLocaleString('en-ZA', { month: 'long', year: 'numeric' });
+---
+<AppShell title="Monthly summary" area="portal" userName={user.name}>
+  <h1>Monthly summary</h1>
+  <p class="muted">{brand?.name} · {label} (HTML stub — PDF export later)</p>
+  <div class="card" id="summary-print">
+    <h2>{brand?.name}</h2>
+    <p>True Tag authentication summary for {label}.</p>
+    <ul>
+      <li>Total scans: <strong>{scans[0].n}</strong></li>
+      <li>Genuine verdicts: <strong>{genuine[0].n}</strong></li>
+      <li>Suspicious verdicts: <strong>{suspicious[0].n}</strong></li>
+      <li>Consumer reports: <strong>{reports[0].n}</strong></li>
+      <li>New codes issued: <strong>{codes[0].n}</strong></li>
+    </ul>
+    <p class="muted" style="font-size:.9rem">Genuine means issued by your brand through True Tag and behaving normally. This is not a government certificate.</p>
+  </div>
+  <p style="margin-top:1rem"><button class="btn" type="button" onclick="window.print()">Print / save as PDF</button></p>
+</AppShell>

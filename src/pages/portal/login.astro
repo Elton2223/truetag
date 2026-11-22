@@ -1,0 +1,58 @@
+---
+import '../../styles/global.css';
+import { site } from '../../content/site';
+import { getSessionToken, getSessionUser } from '../../lib/auth';
+
+export const prerender = false;
+
+const user = await getSessionUser(getSessionToken(Astro.cookies));
+if (user?.role === 'brand') return Astro.redirect('/portal');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brand portal | {site.name}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <main class="wrap" style="max-width:420px;padding:4rem 0">
+      <h1>Brand portal</h1>
+      <p class="muted">Sign in after your brand is verified by True Tag.</p>
+      <div id="err" class="flash err" hidden></div>
+      <form class="stack-form card" id="login" style="margin-top:1rem">
+        <label>Email<input type="email" name="email" required value="brand@example.com" /></label>
+        <label>Password<input type="password" name="password" required /></label>
+        <button class="btn" type="submit">Log in</button>
+      </form>
+      <p class="muted" style="margin-top:1rem"><a href="/brands">Request a pilot</a> · <a href="/">Site</a></p>
+    </main>
+    <style>
+      .stack-form { display: grid; gap: .8rem; }
+      .stack-form label { display: grid; gap: .3rem; font-weight: 600; }
+      .stack-form input { font: inherit; padding: .65rem .8rem; border: 1px solid #c5d5d9; border-radius: 12px; }
+      .flash.err { background: #fde8e6; color: var(--bad); padding: .8rem 1rem; border-radius: 12px; margin-bottom: 1rem; }
+    </style>
+    <script>
+      document.getElementById('login').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const f = new FormData(e.target);
+        const err = document.getElementById('err');
+        err.hidden = true;
+        const res = await fetch('/api/v1/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: f.get('email'), password: f.get('password'), area: 'portal' }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          err.textContent = data.error || 'Login failed';
+          err.hidden = false;
+          return;
+        }
+        location.href = data.redirect || '/portal';
+      });
+    </script>
+  </body>
+</html>

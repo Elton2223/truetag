@@ -1,0 +1,31 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+
+const [brands, products, codes, scans, suspicious, reports, pilots] = await Promise.all([
+  query<Row[]>(`SELECT COUNT(*) AS n FROM brands`),
+  query<Row[]>(`SELECT COUNT(*) AS n FROM products`),
+  query<Row[]>(`SELECT COUNT(*) AS n FROM codes`),
+  query<Row[]>(`SELECT COUNT(*) AS n FROM scan_events`),
+  query<Row[]>(`SELECT COUNT(*) AS n FROM codes WHERE status = 'flagged'`),
+  query<Row[]>(`SELECT COUNT(*) AS n FROM consumer_reports WHERE status = 'new'`),
+  query<Row[]>(`SELECT COUNT(*) AS n FROM pilot_requests`),
+]);
+---
+<AppShell title="Overview" area="admin" userName={user.name}>
+  <h1>Overview</h1>
+  <p class="muted">Registry health for True Tag staff.</p>
+  <div class="stat-grid">
+    <div class="stat"><strong>{brands[0].n}</strong> Brands</div>
+    <div class="stat"><strong>{products[0].n}</strong> Products</div>
+    <div class="stat"><strong>{codes[0].n}</strong> Codes</div>
+    <div class="stat"><strong>{scans[0].n}</strong> Scans</div>
+    <div class="stat"><strong>{suspicious[0].n}</strong> Flagged codes</div>
+    <div class="stat"><strong>{reports[0].n}</strong> New reports</div>
+    <div class="stat"><strong>{pilots[0].n}</strong> Pilot requests</div>
+  </div>
+  <p><a class="btn" href="/admin/brands">Vet brands</a> <a class="btn ghost" href="/admin/codes">Generate codes</a></p>
+</AppShell>

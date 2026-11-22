@@ -1,0 +1,29 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+import { formatWhen } from '../../lib/format';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+
+const pilots = await query<Row[]>(
+  `SELECT * FROM pilot_requests ORDER BY created_at DESC LIMIT 100`,
+);
+---
+<AppShell title="Pilots" area="admin" userName={user.name}>
+  <h1>Pilot requests</h1>
+  <table class="data">
+    <thead><tr><th>When</th><th>Company</th><th>Contact</th><th>Type</th><th>Message</th></tr></thead>
+    <tbody>
+      {pilots.map((p) => (
+        <tr>
+          <td>{formatWhen(p.created_at)}</td>
+          <td>{p.company}</td>
+          <td>{p.contact_name}<br /><a href={`mailto:${p.email}`}>{p.email}</a></td>
+          <td>{p.product_type}</td>
+          <td>{p.message || '—'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

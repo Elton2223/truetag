@@ -1,0 +1,67 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const flash = Astro.url.searchParams.get('ok');
+const err = Astro.url.searchParams.get('err');
+
+const brands = await query<Row[]>(
+  `SELECT id, name, reg_number, licence_notes, status, contact_email, created_at
+   FROM brands ORDER BY FIELD(status,'pending','verified','suspended'), created_at DESC`,
+);
+---
+<AppShell title="Brands" area="admin" userName={user.name}>
+  <h1>Brands</h1>
+  <p class="muted">Vet company identity before issuing codes. Pending brands cannot produce “genuine” verdicts.</p>
+  {flash && <div class="flash">Saved.</div>}
+  {err && <div class="flash err">{err}</div>}
+
+  <h2 style="margin-top:2rem">Add brand</h2>
+  <form class="stack-form card" method="post" action="/api/v1/admin/brands">
+    <label>Name<input name="name" required /></label>
+    <label>Company registration<input name="reg_number" /></label>
+    <label>Licence / identity notes<textarea name="licence_notes" rows="2"></textarea></label>
+    <label>Contact email<input name="contact_email" type="email" /></label>
+    <label>Status
+      <select name="status">
+        <option value="pending">pending</option>
+        <option value="verified">verified</option>
+      </select>
+    </label>
+    <label>Portal user email (optional)<input name="user_email" type="email" placeholder="brand@company.co.za" /></label>
+    <label>Portal user password (if email set)<input name="user_password" type="password" /></label>
+    <button class="btn" type="submit">Create</button>
+  </form>
+
+  <h2 style="margin-top:2.5rem">All brands</h2>
+  <table class="data">
+    <thead><tr><th>Name</th><th>Reg</th><th>Status</th><th>Contact</th><th></th></tr></thead>
+    <tbody>
+      {brands.map((b) => (
+        <tr>
+          <td><strong>{b.name}</strong><div class="muted" style="font-size:.85rem">{b.licence_notes || ''}</div></td>
+          <td>{b.reg_number || '—'}</td>
+          <td><span class={`pill ${b.status === 'verified' ? 'ok' : b.status === 'pending' ? 'warn' : 'bad'}`}>{b.status}</span></td>
+          <td>{b.contact_email || '—'}</td>
+          <td style="white-space:nowrap">
+            {b.status !== 'verified' && (
+              <form method="post" action={`/api/v1/admin/brands/${b.id}/status`} style="display:inline">
+                <input type="hidden" name="status" value="verified" />
+                <button class="btn" type="submit" style="padding:.35rem .8rem;font-size:.85rem">Verify</button>
+              </form>
+            )}
+            {b.status === 'verified' && (
+              <form method="post" action={`/api/v1/admin/brands/${b.id}/status`} style="display:inline">
+                <input type="hidden" name="status" value="suspended" />
+                <button class="btn ghost" type="submit" style="padding:.35rem .8rem;font-size:.85rem">Suspend</button>
+              </form>
+            )}
+            <a href={`/admin/brands/${b.id}`}>Manage</a>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

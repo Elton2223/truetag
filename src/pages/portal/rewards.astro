@@ -1,0 +1,51 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const brandId = user.brandId!;
+const flash = Astro.url.searchParams.get('ok');
+
+const products = await query<Row[]>(`SELECT id, name FROM products WHERE brand_id = :brandId`, { brandId });
+const campaigns = await query<Row[]>(
+  `SELECT rc.*, p.name AS product_name,
+          (SELECT COUNT(*) FROM reward_claims x WHERE x.campaign_id = rc.id) AS claims
+   FROM reward_campaigns rc
+   LEFT JOIN products p ON p.id = rc.product_id
+   WHERE rc.brand_id = :brandId
+   ORDER BY rc.created_at DESC`,
+  { brandId },
+);
+---
+<AppShell title="Rewards" area="portal" userName={user.name}>
+  <h1>Scan-to-engage</h1>
+  <p class="muted">Shoppers can earn a claim after a first genuine scan. Redemption is stubbed for now.</p>
+  {flash && <div class="flash">Campaign saved.</div>}
+  <form class="stack-form card" method="post" action="/api/v1/brands/me/rewards">
+    <label>Title<input name="title" required placeholder="First scan thanks" /></label>
+    <label>Message<textarea name="message" rows="2" required placeholder="Show this for a free sticker"></textarea></label>
+    <label>Product (optional)
+      <select name="product_id">
+        <option value="">All products</option>
+        {products.map((p) => <option value={p.id}>{p.name}</option>)}
+      </select>
+    </label>
+    <label>Claim limit per code<input type="number" name="claim_limit" value="1" min="1" max="10" /></label>
+    <button class="btn" type="submit">Create campaign</button>
+  </form>
+  <h2 style="margin-top:2rem">Campaigns</h2>
+  <table class="data">
+    <thead><tr><th>Title</th><th>Product</th><th>Claims</th><th>Active</th></tr></thead>
+    <tbody>
+      {campaigns.map((c) => (
+        <tr>
+          <td><strong>{c.title}</strong><div class="muted">{c.message}</div></td>
+          <td>{c.product_name || 'All'}</td>
+          <td>{c.claims}</td>
+          <td>{c.active ? 'yes' : 'no'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

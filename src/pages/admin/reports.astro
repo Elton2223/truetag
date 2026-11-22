@@ -1,0 +1,43 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+import { formatWhen } from '../../lib/format';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+
+const reports = await query<Row[]>(
+  `SELECT r.*, br.name AS brand_name, c.code AS linked_code
+   FROM consumer_reports r
+   LEFT JOIN brands br ON br.id = r.brand_id
+   LEFT JOIN codes c ON c.id = r.code_id
+   ORDER BY r.created_at DESC LIMIT 100`,
+);
+---
+<AppShell title="Reports" area="admin" userName={user.name}>
+  <h1>Consumer reports</h1>
+  <table class="data">
+    <thead><tr><th>When</th><th>Code</th><th>Brand</th><th>Message</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {reports.map((r) => (
+        <tr>
+          <td>{formatWhen(r.created_at)}</td>
+          <td><code>{r.linked_code || r.code_text || '—'}</code></td>
+          <td>{r.brand_name || '—'}</td>
+          <td>{r.message}</td>
+          <td><span class="pill muted">{r.status}</span></td>
+          <td>
+            <form method="post" action={`/api/v1/admin/reports/${r.id}/status`} style="display:flex;gap:.4rem">
+              <select name="status">
+                <option value="reviewed">reviewed</option>
+                <option value="escalated">escalated</option>
+                <option value="closed">closed</option>
+              </select>
+              <button class="btn" type="submit" style="padding:.3rem .7rem;font-size:.8rem">Update</button>
+            </form>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

@@ -1,0 +1,87 @@
+---
+import '../styles/global.css';
+import { site } from '../content/site';
+
+interface Props {
+  title: string;
+  area: 'admin' | 'portal';
+  userName?: string;
+}
+const { title, area, userName } = Astro.props;
+const home = area === 'admin' ? '/admin' : '/portal';
+const nav =
+  area === 'admin'
+    ? [
+        { href: '/admin', label: 'Overview' },
+        { href: '/admin/brands', label: 'Brands' },
+        { href: '/admin/codes', label: 'Codes' },
+        { href: '/admin/scans', label: 'Scans' },
+        { href: '/admin/reports', label: 'Reports' },
+        { href: '/admin/pilots', label: 'Pilots' },
+      ]
+    : [
+        { href: '/portal', label: 'Dashboard' },
+        { href: '/portal/products', label: 'Products' },
+        { href: '/portal/codes', label: 'Codes' },
+        { href: '/portal/reports', label: 'Reports' },
+        { href: '/portal/rewards', label: 'Rewards' },
+        { href: '/portal/summary', label: 'Monthly summary' },
+      ];
+const path = Astro.url.pathname.replace(/\/$/, '') || home;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} | {site.name} {area}</title>
+    <style>
+      .app-nav { background: var(--green); color: var(--ice); padding: .85rem 0; position: sticky; top: 0; z-index: 20; }
+      .app-nav .inner { display: flex; flex-wrap: wrap; gap: .75rem 1.2rem; align-items: center; justify-content: space-between; }
+      .app-nav a { color: var(--ice); text-decoration: none; opacity: .85; font-weight: 600; font-size: .95rem; }
+      .app-nav a[aria-current="page"], .app-nav a:hover { opacity: 1; }
+      .app-nav .brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; }
+      .app-nav ul { display: flex; flex-wrap: wrap; gap: .9rem; list-style: none; margin: 0; padding: 0; }
+      .app-main { padding: 2rem 0 4rem; }
+      .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 1.2rem 0 2rem; }
+      .stat { background: var(--card); border-radius: var(--radius); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+      .stat strong { display: block; font-size: 1.8rem; color: var(--green); font-family: Georgia, serif; }
+      table.data { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+      table.data th, table.data td { text-align: left; padding: .75rem 1rem; border-bottom: 1px solid var(--green-soft); font-size: .95rem; }
+      table.data th { background: var(--green-soft); color: var(--green); }
+      .stack-form { display: grid; gap: .8rem; max-width: 480px; }
+      .stack-form label { display: grid; gap: .3rem; font-weight: 600; font-size: .9rem; }
+      .stack-form input, .stack-form select, .stack-form textarea {
+        font: inherit; padding: .65rem .8rem; border: 1px solid #c5d5d9; border-radius: 12px; background: #fff;
+      }
+      .flash { padding: .8rem 1rem; border-radius: 12px; background: var(--green-soft); margin-bottom: 1rem; }
+      .flash.err { background: #fde8e6; color: var(--bad); }
+      .pill { display: inline-block; padding: .15rem .55rem; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+      .pill.ok { background: #e5f6df; color: var(--ok); }
+      .pill.warn { background: #fff3e0; color: var(--warn); }
+      .pill.bad { background: #fde8e6; color: var(--bad); }
+      .pill.muted { background: var(--green-soft); color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <header class="app-nav">
+      <div class="wrap inner">
+        <a class="brand" href={home}><img src={site.logo} alt="" width="22" height="30" />{site.name} {area}</a>
+        <ul>
+          {nav.map((l) => (
+            <li><a href={l.href} aria-current={path === l.href || (l.href !== home && path.startsWith(l.href)) ? 'page' : undefined}>{l.label}</a></li>
+          ))}
+        </ul>
+        <div style="display:flex;gap:1rem;align-items:center;font-size:.9rem">
+          {userName && <span style="opacity:.8">{userName}</span>}
+          <form method="post" action="/api/v1/auth/logout" style="margin:0">
+            <button class="btn" type="submit" style="padding:.4rem 1rem;font-size:.85rem">Log out</button>
+          </form>
+        </div>
+      </div>
+    </header>
+    <main class="app-main"><div class="wrap"><slot /></div></main>
+  </body>
+</html>

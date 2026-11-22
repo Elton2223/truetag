@@ -9,12 +9,12 @@ import { site } from '../content/site';
     <h2>Who we are</h2>
     <p>{site.legalName} ("True Tag") runs this website and product verification service. Contact: {site.email}.</p>
     <h2>What we collect</h2>
-    <p>When you check a code we record the time, the channel, the result and an approximate location. We keep locations coarse unless you agree to share more. We do not ask for your name to check a product.</p>
-    <p>If you send a pilot request, report a fake or email us, we use the details you give to reply to you.</p>
+    <p>When you check a code we record the time, the channel (web, WhatsApp stub, SMS stub or API), the verdict, a hashed IP address, an optional coarse city if provided, and a truncated user-agent. We do not ask for your name to check a product.</p>
+    <p>If you send a pilot request, report a fake, claim a reward stub or email us, we use the details you give to reply to you and (for reports) to inform the brand that owns the code.</p>
     <h2>Why</h2>
-    <p>To give you a verdict, to help brands spot counterfeit activity, and to improve the service.</p>
+    <p>To give you a verdict, to help brands spot counterfeit activity, to rate-limit abuse, and to improve the service.</p>
     <h2>Sharing</h2>
-    <p>Brands see scan results for their own products, not your personal details. We share information with authorities only where the law requires it.</p>
+    <p>Brands see scan results and consumer reports for their own products. They do not receive your hashed IP. We share information with authorities only where the law requires it.</p>
     <h2>Your rights</h2>
     <p>You may ask us to see, correct or delete your personal information by emailing {site.email}.</p>
   </div>

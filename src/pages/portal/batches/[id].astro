@@ -1,0 +1,51 @@
+---
+import AppShell from '../../../layouts/AppShell.astro';
+import { query, type Row } from '../../../lib/db';
+import { verifyUrlForCode } from '../../../lib/codes-service';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const brandId = user.brandId!;
+const id = Astro.params.id!;
+
+const batches = await query<Row[]>(
+  `SELECT b.*, p.name AS product_name, p.id AS product_id
+   FROM batches b
+   JOIN products p ON p.id = b.product_id
+   WHERE b.id = :id AND p.brand_id = :brandId`,
+  { id, brandId },
+);
+const batch = batches[0];
+if (!batch) return Astro.redirect('/portal/products');
+
+const codes = await query<Row[]>(
+  `SELECT code, status, scan_count, scan_limit FROM codes WHERE batch_id = :id ORDER BY created_at DESC LIMIT 200`,
+  { id },
+);
+const generated = Astro.url.searchParams.get('n');
+---
+<AppShell title={`Batch ${batch.label}`} area="portal" userName={user.name}>
+  <p><a href={`/portal/products/${batch.product_id}`}>← {batch.product_name}</a></p>
+  <h1>Batch {batch.label}</h1>
+  {generated && <div class="flash">Generated {generated} codes.</div>}
+  <form class="stack-form card" method="post" action={`/api/v1/brands/me/batches/${batch.id}/codes`}>
+    <label>How many<input name="count" type="number" min="1" max="5000" value="10" /></label>
+    <label>Scan limit<input name="scan_limit" type="number" min="1" max="100" value="5" /></label>
+    <button class="btn" type="submit">Generate codes</button>
+  </form>
+  <p style="margin-top:1rem"><a class="btn ghost" href={`/api/v1/brands/me/batches/${batch.id}/export.csv`}>Download CSV</a></p>
+  <h2 style="margin-top:2rem">Codes</h2>
+  <table class="data">
+    <thead><tr><th>Code</th><th>Status</th><th>Scans</th><th>URL</th></tr></thead>
+    <tbody>
+      {codes.map((c) => (
+        <tr>
+          <td><code>{c.code}</code></td>
+          <td>{c.status}</td>
+          <td>{c.scan_count}/{c.scan_limit}</td>
+          <td style="font-size:.8rem;word-break:break-all"><a href={verifyUrlForCode(c.code)}>link</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

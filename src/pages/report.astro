@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+
+export const prerender = false;
+const ok = Astro.url.searchParams.get('ok');
+const err = Astro.url.searchParams.get('err');
+const code = Astro.url.searchParams.get('code') || '';
+---
+<Base title="Report a fake">
+  <div class="wrap page-head" style="max-width:640px">
+    <h1>Report a suspected fake</h1>
+    <p class="muted">Tell us what you found. We share reports with the brand that owns the code (if known), not your personal details beyond what you enter here.</p>
+  </div>
+  <section style="padding-top:0">
+    <div class="wrap" style="max-width:640px">
+      {ok && <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--ok)">Thanks — we received your report.</div>}
+      {err && <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--bad)">Could not save the report. Please try again.</div>}
+      <form class="pilot card" method="post" action="/api/v1/reports">
+        <label>Code (if you have one)<input name="code" value={code} placeholder="TT-XXXX-XXXX-XXXX" /></label>
+        <label>What happened<textarea name="message" rows="4" required placeholder="Where you bought it, why it looks wrong…"></textarea></label>
+        <label>City (optional)<input name="city" placeholder="e.g. Durban" /></label>
+        <label>Email (optional)<input name="email" type="email" /></label>
+        <label>Phone (optional)<input name="phone" /></label>
+        <button class="btn" type="submit">Send report</button>
+      </form>
+    </div>
+  </section>
+</Base>

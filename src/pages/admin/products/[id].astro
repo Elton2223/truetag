@@ -1,0 +1,53 @@
+---
+import AppShell from '../../../layouts/AppShell.astro';
+import { query, type Row } from '../../../lib/db';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const id = Astro.params.id!;
+
+const products = await query<Row[]>(
+  `SELECT p.*, br.name AS brand_name, br.id AS brand_id
+   FROM products p JOIN brands br ON br.id = p.brand_id WHERE p.id = :id`,
+  { id },
+);
+const product = products[0];
+if (!product) return Astro.redirect('/admin/brands?err=Product+not+found');
+
+const batches = await query<Row[]>(
+  `SELECT b.*, (SELECT COUNT(*) FROM codes c WHERE c.batch_id = b.id) AS code_count
+   FROM batches b WHERE product_id = :id ORDER BY created_at DESC`,
+  { id },
+);
+const flash = Astro.url.searchParams.get('ok');
+---
+<AppShell title={product.name} area="admin" userName={user.name}>
+  <p><a href={`/admin/brands/${product.brand_id}`}>← {product.brand_name}</a></p>
+  <h1>{product.name}</h1>
+  <p class="muted">{product.category}{product.sku ? ` · ${product.sku}` : ''}</p>
+  {flash && <div class="flash">Saved.</div>}
+
+  <h2>Add batch</h2>
+  <form class="stack-form card" method="post" action="/api/v1/admin/batches">
+    <input type="hidden" name="product_id" value={product.id} />
+    <label>Label<input name="label" required placeholder="B-2026-014" /></label>
+    <label>Manufactured<input name="manufactured_on" type="date" /></label>
+    <label>Expires<input name="expires_on" type="date" /></label>
+    <button class="btn" type="submit">Create batch</button>
+  </form>
+
+  <h2 style="margin-top:2rem">Batches</h2>
+  <table class="data">
+    <thead><tr><th>Label</th><th>Codes</th><th>Manufactured</th><th></th></tr></thead>
+    <tbody>
+      {batches.map((b) => (
+        <tr>
+          <td>{b.label}</td>
+          <td>{b.code_count}</td>
+          <td>{b.manufactured_on || '—'}</td>
+          <td><a href={`/admin/batches/${b.id}`}>Generate / export</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

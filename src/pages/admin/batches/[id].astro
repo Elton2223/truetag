@@ -1,0 +1,60 @@
+---
+import AppShell from '../../../layouts/AppShell.astro';
+import { query, type Row } from '../../../lib/db';
+import { verifyUrlForCode } from '../../../lib/codes-service';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const id = Astro.params.id!;
+
+const batches = await query<Row[]>(
+  `SELECT b.*, p.name AS product_name, p.id AS product_id, br.name AS brand_name, br.status AS brand_status
+   FROM batches b
+   JOIN products p ON p.id = b.product_id
+   JOIN brands br ON br.id = p.brand_id
+   WHERE b.id = :id`,
+  { id },
+);
+const batch = batches[0];
+if (!batch) return Astro.redirect('/admin/brands?err=Batch+not+found');
+
+const codes = await query<Row[]>(
+  `SELECT code, status, scan_count, scan_limit, created_at FROM codes WHERE batch_id = :id ORDER BY created_at DESC LIMIT 200`,
+  { id },
+);
+const flash = Astro.url.searchParams.get('ok');
+const generated = Astro.url.searchParams.get('n');
+---
+<AppShell title={`Batch ${batch.label}`} area="admin" userName={user.name}>
+  <p><a href={`/admin/products/${batch.product_id}`}>← {batch.product_name}</a></p>
+  <h1>Batch {batch.label}</h1>
+  <p class="muted">{batch.brand_name} · {batch.product_name}
+    {batch.brand_status !== 'verified' && <span class="pill warn">Brand not verified — codes will not verify as genuine</span>}
+  </p>
+  {flash && <div class="flash">{generated ? `Generated ${generated} codes.` : 'Saved.'}</div>}
+
+  <h2>Generate codes</h2>
+  <form class="stack-form card" method="post" action={`/api/v1/admin/batches/${batch.id}/codes`}>
+    <label>How many<input name="count" type="number" min="1" max="5000" value="10" required /></label>
+    <label>Scan limit per code<input name="scan_limit" type="number" min="1" max="100" value="5" /></label>
+    <button class="btn" type="submit">Generate</button>
+  </form>
+  <p style="margin-top:1rem">
+    <a class="btn ghost" href={`/api/v1/admin/batches/${batch.id}/export.csv`}>Download CSV + QR URLs</a>
+  </p>
+
+  <h2 style="margin-top:2rem">Codes (latest 200)</h2>
+  <table class="data">
+    <thead><tr><th>Code</th><th>Status</th><th>Scans</th><th>Verify URL</th></tr></thead>
+    <tbody>
+      {codes.map((c) => (
+        <tr>
+          <td><code>{c.code}</code></td>
+          <td><span class={`pill ${c.status === 'active' ? 'ok' : c.status === 'flagged' ? 'warn' : 'bad'}`}>{c.status}</span></td>
+          <td>{c.scan_count}/{c.scan_limit}</td>
+          <td style="font-size:.8rem;word-break:break-all"><a href={verifyUrlForCode(c.code)}>{verifyUrlForCode(c.code)}</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>

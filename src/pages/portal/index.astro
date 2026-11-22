@@ -1,0 +1,80 @@
+---
+import AppShell from '../../layouts/AppShell.astro';
+import { query, type Row } from '../../lib/db';
+import { formatWhen } from '../../lib/format';
+
+export const prerender = false;
+const user = Astro.locals.user!;
+const brandId = user.brandId!;
+
+const [scans, suspicious, reports, codes, brandRows] = await Promise.all([
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM scan_events s
+     JOIN codes c ON c.id = s.code_id
+     JOIN batches b ON b.id = c.batch_id
+     JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId`,
+    { brandId },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM codes c
+     JOIN batches b ON b.id = c.batch_id
+     JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId AND c.status = 'flagged'`,
+    { brandId },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM consumer_reports WHERE brand_id = :brandId AND status = 'new'`,
+    { brandId },
+  ),
+  query<Row[]>(
+    `SELECT COUNT(*) AS n FROM codes c
+     JOIN batches b ON b.id = c.batch_id
+     JOIN products p ON p.id = b.product_id
+     WHERE p.brand_id = :brandId`,
+    { brandId },
+  ),
+  query<Row[]>(`SELECT name FROM brands WHERE id = :id`, { id: brandId }),
+]);
+
+const recent = await query<Row[]>(
+  `SELECT s.created_at, s.verdict, s.channel, s.city_approx, c.code, p.name AS product_name
+   FROM scan_events s
+   JOIN codes c ON c.id = s.code_id
+   JOIN batches b ON b.id = c.batch_id
+   JOIN products p ON p.id = b.product_id
+   WHERE p.brand_id = :brandId
+   ORDER BY s.created_at DESC LIMIT 20`,
+  { brandId },
+);
+---
+<AppShell title="Dashboard" area="portal" userName={user.name}>
+  <h1>{brandRows[0]?.name || 'Brand'} dashboard</h1>
+  <p class="muted">Scan activity for your products only.</p>
+  <div class="stat-grid">
+    <div class="stat"><strong>{scans[0].n}</strong> Scans</div>
+    <div class="stat"><strong>{suspicious[0].n}</strong> Suspicious codes</div>
+    <div class="stat"><strong>{reports[0].n}</strong> New consumer reports</div>
+    <div class="stat"><strong>{codes[0].n}</strong> Codes issued</div>
+  </div>
+  <div class="cta-row" style="margin-bottom:1.5rem">
+    <a class="btn" href="/portal/products">Manage products</a>
+    <a class="btn ghost" href="/portal/summary">Monthly summary</a>
+  </div>
+  <h2>Recent scans</h2>
+  <table class="data">
+    <thead><tr><th>When</th><th>Code</th><th>Verdict</th><th>Channel</th><th>City</th><th>Product</th></tr></thead>
+    <tbody>
+      {recent.map((s) => (
+        <tr>
+          <td>{formatWhen(s.created_at)}</td>
+          <td><code>{s.code}</code></td>
+          <td><span class={`pill ${s.verdict === 'genuine' ? 'ok' : s.verdict === 'suspicious' ? 'warn' : 'bad'}`}>{s.verdict}</span></td>
+          <td>{s.channel}</td>
+          <td>{s.city_approx || '—'}</td>
+          <td>{s.product_name}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AppShell>
