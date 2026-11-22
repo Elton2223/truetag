@@ -19,7 +19,7 @@ const t = (k: string) => strings.en[k];
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0e4d3a" />
+    <meta name="theme-color" content="#234911" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title} | {site.name}</title>
   </head>
@@ -27,7 +27,7 @@ const t = (k: string) => strings.en[k];
     <div class="nav-wrap">
       <div class="wrap">
         <nav class="nav" aria-label="Main">
-          <a class="brand" href="/"><img src={site.logo} alt="" width="34" height="34" />{site.name}</a>
+          <a class="brand" href="/"><img src={site.logo} alt="" width="26" height="36" />{site.name}</a>
           <ul>
             {links.map((l) => (
               <li><a href={l.href} data-i18n={l.key} aria-current={path === l.href ? 'page' : undefined}>{t(l.key)}</a></li>
@@ -49,7 +49,7 @@ const t = (k: string) => strings.en[k];
         <div class="cols">
           <div>
             <strong style="color:#fff">{site.name}</strong>
-            <p>Check it before you buy it. Free for shoppers, built for honest brands.</p>
+            <p>Proving what's genuine, before the sale.</p><p>{site.city}</p>
           </div>
           <div>
             <strong style="color:#fff">Explore</strong>

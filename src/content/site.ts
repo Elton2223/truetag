@@ -4,17 +4,38 @@ export const site = {
   legalName: 'True Tag (Pty) Ltd',
   domain: 'www.truetag.co.za',
   email: 'info@truetag.co.za',
-  address: '[Company address - to be inserted]',
-  whatsappNumber: '27000000000', // international format, no +, placeholder
-  logo: '/logo/logo.svg', // replace public/logo/logo.svg with the real logo
+  address: '81 Ribbon Road, Newlands East, Durban 4037',
+  city: 'Durban, South Africa',
+  whatsappNumber: '', // business WhatsApp in international format, no +, e.g. 27XXXXXXXXX. Empty = buttons fall back to email.
+  logo: '/logo/truetag-mark.svg',
+  logoFull: '/logo/truetag-full.svg',
   tagline: 'Is it genuine? Find out before you buy.',
+  aboutHeadline: "Proving what's genuine, before the sale.",
+  description:
+    'True Tag is an independent product authentication company based in Durban, South Africa. Every product carries a unique, scan-limited code that shoppers can check for free before they buy, by QR scan, WhatsApp, SMS or the web. Brands get reports on scans, suspicious activity and consumer reports of suspected fakes. We serve liquor, beverage and tobacco brands.',
+  story:
+    'Illicit goods cost South Africa about R100 billion a year, according to SARS. More than 60% of cigarettes sold are illegal, and counterfeit alcohol has killed. Shoppers cannot tell a fake from the real thing, and honest brands cannot see where fakes enter the market. True Tag gives both sides certainty.',
   mission:
-    'To give every South African a free, instant way to check that what they are about to buy or drink is genuine, and to help honest brands protect their customers and their name.',
+    'To protect consumers and honest brands by making the authenticity of every product instantly verifiable, by anyone, on any phone, before they buy.',
   vision:
-    'A South Africa where fake alcohol and cigarettes cannot hide, and where every shopper can trust what is on the shelf.',
+    'A South Africa, and in time a wider Africa, where counterfeit and illicit goods have nowhere to hide, because trust in what you buy can be proven with a single scan.',
+  differentiators: [
+    'We are independent of the industries we protect.',
+    'We reward shoppers after they verify (scan-to-engage).',
+    'No app is needed: shoppers can verify by WhatsApp or SMS.',
+    'We are built to work with the planned SARS and National Consumer Commission track-and-trace system.',
+  ],
   founders: [
-    { name: 'Sthembiso Xulu', role: 'Co-founder', bio: '[Short bio to be inserted]' },
-    { name: 'Siphesihle Khoza', role: 'Co-founder', bio: '[Short bio to be inserted]' },
+    {
+      name: 'Sthembiso Xulu',
+      role: 'Co-Founder and CEO',
+      bio: "Sthembiso is a self-taught interior designer with more than 10 years of experience in the industry, who runs his own company, MATT Closet. That experience of working with clients and delivering projects underpins his role leading True Tag's brand partnerships and fundraising. He is driven by a personal commitment to fighting South Africa's illicit goods trade and protecting the health of his fellow citizens.",
+    },
+    {
+      name: 'Siphesihle Khoza',
+      role: 'Co-Founder and Managing Director',
+      bio: "Siphesihle is an IT software development graduate who holds a Bachelor's degree from the Richfield Graduate Institute (2019), where he received a top achiever award. He has worked in technical sales, project management and administration, combining technical understanding with commercial experience. He leads True Tag's platform build and operations, and is committed to making everyday goods safe for South African consumers.",
+    },
   ],
   figures: [
     { value: 'R100bn', label: 'lost to illicit trade in South Africa every year' },
@@ -24,7 +45,9 @@ export const site = {
 };
 
 export const whatsappLink = (text = 'Hi True Tag, I would like to know more.') =>
-  `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(text)}`;
+  site.whatsappNumber
+    ? `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(text)}`
+    : `mailto:${site.email}?subject=${encodeURIComponent('True Tag enquiry')}&body=${encodeURIComponent(text)}`;
 
 export type Verdict = 'genuine' | 'suspicious' | 'invalid';
 

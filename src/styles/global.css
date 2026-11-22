@@ -1,18 +1,19 @@
 :root {
   --ice: #f4f8fa;
-  --green: #0e4d3a; /* placeholder: replace with the exact logo green */
-  --green-dark: #0a3a2b;
-  --green-soft: #e3efe9;
+  --green: #234911; /* logo dark green */
+  --leaf: #318e0e; /* logo bright green */
+  --green-dark: #183309;
+  --green-soft: #e6f0df;
   --peach: #f59e7b;
   --peach-dark: #e8855f;
-  --ink: #17302a;
+  --ink: #1b2e14;
   --muted: #5a6f69;
   --card: #ffffff;
-  --ok: #1a7f4b;
+  --ok: #2a7d0c;
   --warn: #b45309;
   --bad: #b3261e;
   --radius: 20px;
-  --shadow: 0 10px 30px rgba(14, 77, 58, 0.08);
+  --shadow: 0 10px 30px rgba(35, 73, 17, 0.09);
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -45,7 +46,7 @@ section { padding: 4.5rem 0; }
 .grid.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .band { background: var(--green); color: var(--ice); }
 .band h2, .band h3 { color: var(--ice); }
-.band .muted { color: #bcd3ca; }
+.band .muted { color: #c6dbb9; }
 .page-head { padding: 3.5rem 0 1rem; }
 
 .nav-wrap { position: sticky; top: 0; z-index: 20; padding: .8rem 0; }
@@ -55,7 +56,7 @@ section { padding: 4.5rem 0; }
   box-shadow: var(--shadow);
 }
 .brand { display: flex; align-items: center; gap: .6rem; font-weight: 700; color: var(--green); text-decoration: none; }
-.brand img { width: 34px; height: 34px; }
+.brand img { width: 26px; height: 36px; }
 .nav ul { list-style: none; display: flex; gap: 1.2rem; margin: 0; padding: 0; flex-wrap: wrap; align-items: center; }
 .nav ul a { text-decoration: none; font-size: .95rem; font-weight: 500; }
 .nav ul a[aria-current='page'] { text-decoration: underline; text-decoration-color: var(--peach); text-underline-offset: 6px; }
@@ -93,7 +94,7 @@ form.pilot input, form.pilot textarea, form.pilot select { font: inherit; paddin
 .prose h2 { font-size: 1.4rem; margin-top: 2rem; }
 .notice { background: #fff4ee; border: 1px dashed var(--peach); border-radius: 12px; padding: .8rem 1rem; font-size: .9rem; }
 
-footer { background: var(--green-dark); color: #bcd3ca; padding: 3rem 0 2rem; margin-top: 2rem; }
+footer { background: var(--green-dark); color: #c6dbb9; padding: 3rem 0 2rem; margin-top: 2rem; }
 footer a { color: var(--ice); }
 footer .cols { display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 footer ul { list-style: none; padding: 0; margin: 0; }
