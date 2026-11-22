@@ -38,8 +38,8 @@ export const site = {
     },
   ],
   figures: [
-    { count: 100, prefix: 'R', suffix: 'bn', label: 'lost every year' },
-    { count: 60, prefix: '', suffix: '%+', label: 'of cigarettes illicit' },
+    { count: 100, prefix: 'R', suffix: 'bn', label: 'lost every year', source: 'Source: SARS' },
+    { count: 60, prefix: '', suffix: '%+', label: 'of cigarettes sold are illicit', source: '' },
     { count: 21, prefix: '', suffix: '', label: 'lives lost at Enyobeni' },
   ],
 };

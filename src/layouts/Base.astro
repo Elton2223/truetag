@@ -47,23 +47,37 @@ const t = (k: string) => strings.en[k];
     <footer>
       <div class="wrap">
         <div class="cols">
-          <div><strong style="color:#fff">{site.name}</strong><p>{site.city}</p></div>
           <div>
+            <span class="foot-logo"><img src={site.logoFull} alt="True Tag" /></span>
+            <p>Independent product authentication for alcohol and tobacco, based in {site.city}.</p>
+          </div>
+          <div>
+            <h4>Product</h4>
+            <ul>
+              <li><a href="/verify">How to verify</a></li>
+              <li><a href="/demo">Demo scan</a></li>
+              <li><a href="/brands">For brands</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Company</h4>
+            <ul>
+              <li><a href="/about">About</a></li>
+              <li><a href="/contact">Contact</a></li>
+              <li><a href="/privacy">Privacy policy</a></li>
+              <li><a href="/terms">Terms</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Contact</h4>
             <ul>
               <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
               <li><a href={whatsappLink()}>WhatsApp us</a></li>
               <li>{site.address}</li>
             </ul>
           </div>
-          <div>
-            <ul>
-              <li><a href="/contact">Contact</a></li>
-              <li><a href="/privacy">Privacy policy</a></li>
-              <li><a href="/terms">Terms</a></li>
-            </ul>
-          </div>
         </div>
-        <p style="margin-top:2rem;font-size:.85rem">&copy; 2026 {site.legalName}</p>
+        <p class="legal">&copy; 2026 {site.legalName}. All rights reserved.</p>
       </div>
     </footer>
     <script define:vars={{ strings }}>

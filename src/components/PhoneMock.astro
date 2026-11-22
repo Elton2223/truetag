@@ -1,0 +1,44 @@
+---
+import { demoCodes, verdictCopy } from '../content/site';
+---
+<div class="phone" aria-hidden="true">
+  <div class="phone-notch"></div>
+  <div class="phone-screen" id="ph-screen">
+    <div class="ph-scan" id="ph-scan">
+      <div class="qr">
+        <svg viewBox="0 0 21 21" width="150" height="150" shape-rendering="crispEdges">
+          <path fill="#0f3d47" d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0zM1 1v5h5V1zM15 1v5h5V1zM1 15v5h5v-5zM2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM8 0h2v2H8zM11 1h2v2h-2zM8 4h3v2H8zM12 5h1v3h-1zM0 8h2v2H0zM3 8h3v1H3zM8 8h2v2H8zM11 9h3v2h-3zM15 8h2v3h-2zM18 8h3v2h-3zM1 11h3v2H1zM5 11h2v2H5zM8 12h2v3H8zM12 12h2v2h-2zM16 12h2v2h-2zM19 11h2v3h-2zM11 15h2v3h-2zM14 15h3v2h-3zM18 16h3v2h-3zM8 17h2v4H8zM12 19h4v2h-4zM17 19h2v2h-2z"/>
+        </svg>
+        <span class="beam"></span>
+      </div>
+      <p>Scanning</p>
+    </div>
+    <div class="ph-result" id="ph-result"></div>
+  </div>
+</div>
+<script define:vars={{ demoCodes, verdictCopy }}>
+  (function () {
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var scan = document.getElementById('ph-scan');
+    var res = document.getElementById('ph-result');
+    var codes = Object.keys(demoCodes);
+    var icons = { genuine: '\u2713', suspicious: '!', invalid: '?' };
+    var i = 0;
+    function show(n) {
+      var code = codes[n], d = demoCodes[code], c = verdictCopy[d.verdict];
+      res.className = 'ph-result ' + d.verdict + ' on';
+      res.innerHTML = '<div class="ph-ico">' + icons[d.verdict] + '</div><strong>' + c.title + '</strong>' +
+        '<span>' + (d.product !== 'Unknown product' ? d.product : c.text) + '</span><small>' + code + '</small>';
+      scan.classList.add('off');
+    }
+    show(0);
+    if (reduce) return;
+    scan.classList.remove('off'); res.classList.remove('on');
+    function cycle() {
+      scan.classList.remove('off'); res.classList.remove('on');
+      setTimeout(function () { show(i); i = (i + 1) % codes.length; }, 1800);
+    }
+    cycle();
+    setInterval(cycle, 4800);
+  })();
+</script>

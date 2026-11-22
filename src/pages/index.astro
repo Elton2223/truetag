@@ -1,9 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
-import Result from '../components/Result.astro';
 import Icon from '../components/Icon.astro';
-import { site, whatsappLink, demoCodes, verdictCopy } from '../content/site';
-const sample = demoCodes['TT-DEMO-1001'];
+import PhoneMock from '../components/PhoneMock.astro';
+import { site, whatsappLink } from '../content/site';
 ---
 <Base title="Is it genuine? Find out before you buy.">
   <section class="hero">
@@ -11,65 +10,103 @@ const sample = demoCodes['TT-DEMO-1001'];
     <div class="wrap hero-grid">
       <div>
         <h1 data-i18n="hero.title">Is it genuine? Find out before you buy.</h1>
+        <p class="lead">Free product check for alcohol and tobacco. No app needed.</p>
         <form class="verify-box" action="/demo" method="get">
           <label for="code" class="sr-only">Product code</label>
-          <input id="code" name="code" placeholder="Type the code" autocomplete="off" required />
+          <input id="code" name="code" placeholder="Enter the code on the pack" autocomplete="off" required />
           <button class="btn" type="submit">Check it</button>
         </form>
-        <a href={whatsappLink('Hi True Tag, I want to check a product.')}>Or check on WhatsApp</a>
-      </div>
-      <div>
-        <div class="hero-card" id="hero-card" aria-live="off">
-          <Result verdict="genuine" product={sample.product} detail={sample.detail} code="TT-DEMO-1001" />
+        <div class="hero-links">
+          <a href={whatsappLink('Hi True Tag, I want to check a product.')}>Check on WhatsApp</a>
+          <a href="/verify">How it works</a>
         </div>
-        <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
       </div>
+      <PhoneMock />
     </div>
   </section>
 
-  <section class="band">
-    <div class="wrap grid three center">
-      {site.figures.map((f) => (
-        <div class="figure-wrap">
-          <div class="figure" data-count={f.count} data-prefix={f.prefix} data-suffix={f.suffix}>{f.prefix}{f.count}{f.suffix}</div>
-          <p class="muted">{f.label}</p>
-        </div>
-      ))}
+  <div class="trust">
+    <div class="wrap">
+      <ul>
+        <li>Independent of the industries we protect</li>
+        <li>Built for SARS and NCC track-and-trace</li>
+        <li>No app needed</li>
+        <li>Based in Durban, South Africa</li>
+      </ul>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="section-title">
+        <span class="eyebrow">How it works</span>
+        <h2>Three seconds to know</h2>
+      </div>
+      <ol class="flow">
+        <li><span class="num"><Icon name="scan" /></span><h3>Scan</h3><p>Camera, WhatsApp or type the code.</p></li>
+        <li><span class="num"><Icon name="shield" /></span><h3>Verdict</h3><p>Genuine, suspicious or not found.</p></li>
+        <li><span class="num"><Icon name="flag" /></span><h3>Act</h3><p>Report a fake or enjoy your reward.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band stats">
+    <div class="wrap">
+      <span class="eyebrow" style="color:#8db1b9">The cost of fakes</span>
+      <h2 style="margin-top:.4rem">Illicit trade is a South African crisis</h2>
+      <div class="grid three" style="margin-top:2.5rem">
+        {site.figures.map((f) => (
+          <div class="figure-wrap">
+            <div class="figure" data-count={f.count} data-prefix={f.prefix} data-suffix={f.suffix}>{f.prefix}{f.count}{f.suffix}</div>
+            <p class="muted" style="margin:.2rem 0 0">{f.label}</p>
+            {f.source && <p class="source">{f.source}</p>}
+          </div>
+        ))}
+      </div>
+      <p class="note">Counterfeit alcohol has killed. True Tag lets anyone check before they buy.</p>
     </div>
   </section>
 
   <section>
-    <div class="wrap grid three">
-      <div class="card tile"><span class="ico"><Icon name="gift" /></span><h3>Scan to engage</h3><p>Verify, then get rewarded.</p></div>
-      <div class="card tile"><span class="ico"><Icon name="phone" /></span><h3>No app needed</h3><p>Camera, WhatsApp or SMS.</p></div>
-      <div class="card tile"><span class="ico"><Icon name="shield" /></span><h3>Government-ready</h3><p>Built for track-and-trace.</p></div>
-    </div>
-  </section>
-
-  <section style="padding-top:0">
-    <div class="wrap center">
-      <div class="cta-row" style="justify-content:center">
-        <a class="btn dark" href="/demo">Check a product</a>
-        <a class="btn" href="/brands#pilot">Request a pilot</a>
+    <div class="wrap">
+      <div class="section-title">
+        <span class="eyebrow">Who it is for</span>
+        <h2>One tag, two kinds of trust</h2>
+      </div>
+      <div class="split">
+        <div class="panel shop">
+          <Icon name="phone" />
+          <h3>For shoppers</h3>
+          <ul>
+            <li>Free, every time</li>
+            <li>Clear verdict in seconds</li>
+            <li>Rewards after you verify</li>
+          </ul>
+          <a class="btn dark" href="/demo">Check a product</a>
+        </div>
+        <div class="panel brand-p">
+          <Icon name="chart" />
+          <h3>For brands</h3>
+          <ul>
+            <li>Unique code on every pack</li>
+            <li>See scans, flags and places</li>
+            <li>Evidence to act on fakes</li>
+          </ul>
+          <a class="btn" href="/brands#pilot">Request a pilot</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <script define:vars={{ demoCodes, verdictCopy }}>
-    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var card = document.getElementById('hero-card');
-    var dots = document.querySelectorAll('#dots i');
-    var codes = Object.keys(demoCodes);
-    var icons = { genuine: '\u2713', suspicious: '!', invalid: '?' };
-    var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-    var i = 0;
-    function render(n) {
-      var code = codes[n], d = demoCodes[code], c = verdictCopy[d.verdict];
-      card.innerHTML = '<div class="result ' + d.verdict + '"><span class="badge pop"><span aria-hidden="true">' + icons[d.verdict] + '</span> ' + c.title + '</span>' +
-        '<p class="muted" style="margin:.6rem 0 0">Code: <strong>' + esc(code) + '</strong></p><h3>' + esc(d.product) + '</h3>' +
-        '<p style="margin-bottom:.4rem">' + esc(d.detail || c.text) + '</p>' + (c.advice ? '<p class="advice">' + esc(c.advice) + '</p>' : '') + '</div>';
-      dots.forEach(function (el, k) { el.classList.toggle('on', k === n); });
-    }
-    if (!reduce) setInterval(function () { i = (i + 1) % codes.length; render(i); }, 3800);
-  </script>
+  <section style="padding-top:0">
+    <div class="wrap">
+      <div class="closing">
+        <h2>Ready to protect your brand?</h2>
+        <div class="cta-row">
+          <a class="btn" href="/brands#pilot">Request a pilot</a>
+          <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire.')}>WhatsApp us</a>
+        </div>
+      </div>
+    </div>
+  </section>
 </Base>
