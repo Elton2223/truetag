@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../content/site';
+---
+<Base title="Privacy policy">
+  <div class="wrap page-head prose" style="max-width:760px">
+    <h1>Privacy policy</h1>
+    <p class="notice">Draft for review. Have an attorney confirm it against POPIA before launch.</p>
+    <h2>Who we are</h2>
+    <p>{site.legalName} ("True Tag") runs this website and product verification service. Contact: {site.email}.</p>
+    <h2>What we collect</h2>
+    <p>When you check a code we record the time, the channel, the result and an approximate location. We keep locations coarse unless you agree to share more. We do not ask for your name to check a product.</p>
+    <p>If you send a pilot request, report a fake or email us, we use the details you give to reply to you.</p>
+    <h2>Why</h2>
+    <p>To give you a verdict, to help brands spot counterfeit activity, and to improve the service.</p>
+    <h2>Sharing</h2>
+    <p>Brands see scan results for their own products, not your personal details. We share information with authorities only where the law requires it.</p>
+    <h2>Your rights</h2>
+    <p>You may ask us to see, correct or delete your personal information by emailing {site.email}.</p>
+  </div>
+</Base>

@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+import { site, whatsappLink } from '../content/site';
+import { languages, strings } from '../i18n/strings';
+interface Props { title: string; description?: string; }
+const { title, description = site.tagline } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const links = [
+  { href: '/verify', key: 'nav.verify' },
+  { href: '/demo', key: 'nav.demo' },
+  { href: '/brands', key: 'nav.brands' },
+  { href: '/about', key: 'nav.about' },
+];
+const t = (k: string) => strings.en[k];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0e4d3a" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} | {site.name}</title>
+  </head>
+  <body>
+    <div class="nav-wrap">
+      <div class="wrap">
+        <nav class="nav" aria-label="Main">
+          <a class="brand" href="/"><img src={site.logo} alt="" width="34" height="34" />{site.name}</a>
+          <ul>
+            {links.map((l) => (
+              <li><a href={l.href} data-i18n={l.key} aria-current={path === l.href ? 'page' : undefined}>{t(l.key)}</a></li>
+            ))}
+            <li>
+              <label class="sr" for="lang" style="position:absolute;left:-9999px">Language</label>
+              <select id="lang" class="lang">
+                {Object.entries(languages).map(([code, name]) => <option value={code}>{name}</option>)}
+              </select>
+            </li>
+            <li><a class="btn" href="/brands#pilot" data-i18n="nav.cta">{t('nav.cta')}</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <main><slot /></main>
+    <footer>
+      <div class="wrap">
+        <div class="cols">
+          <div>
+            <strong style="color:#fff">{site.name}</strong>
+            <p>Check it before you buy it. Free for shoppers, built for honest brands.</p>
+          </div>
+          <div>
+            <strong style="color:#fff">Explore</strong>
+            <ul>
+              <li><a href="/verify">How to verify</a></li>
+              <li><a href="/demo">Demo scan</a></li>
+              <li><a href="/brands">For brands</a></li>
+              <li><a href="/about">About</a></li>
+            </ul>
+          </div>
+          <div>
+            <strong style="color:#fff">Contact</strong>
+            <ul>
+              <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+              <li><a href={whatsappLink()}>WhatsApp us</a></li>
+              <li>{site.address}</li>
+              <li><a href="/contact">Contact page</a></li>
+            </ul>
+          </div>
+          <div>
+            <strong style="color:#fff">Legal</strong>
+            <ul>
+              <li><a href="/privacy">Privacy policy</a></li>
+              <li><a href="/terms">Terms</a></li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:2rem;font-size:.85rem">&copy; 2026 {site.legalName}. All rights reserved.</p>
+      </div>
+    </footer>
+    <script define:vars={{ strings }}>
+      const sel = document.getElementById('lang');
+      const apply = (lang) => {
+        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-i18n]').forEach((el) => {
+          const k = el.getAttribute('data-i18n');
+          el.textContent = (strings[lang] && strings[lang][k]) || strings.en[k] || el.textContent;
+        });
+      };
+      const saved = localStorage.getItem('tt-lang') || 'en';
+      sel.value = saved; apply(saved);
+      sel.addEventListener('change', () => { localStorage.setItem('tt-lang', sel.value); apply(sel.value); });
+    </script>
+  </body>
+</html>

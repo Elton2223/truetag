@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import Result from '../components/Result.astro';
+import { whatsappLink, demoCodes, verdictCopy } from '../content/site';
+---
+<Base title="Demo scan">
+  <div class="wrap page-head">
+    <p class="eyebrow">Demo</p>
+    <h1>See exactly what your customers see</h1>
+    <p class="muted">This is a demonstration with sample codes. Live code checking arrives with the platform build.</p>
+  </div>
+  <section style="padding-top:1rem">
+    <div class="wrap grid two">
+      <div>
+        <form class="verify-box" id="demo-form" style="margin-top:0">
+          <label for="code" style="position:absolute;left:-9999px">Product code</label>
+          <input id="code" name="code" placeholder="TT-DEMO-1001" autocomplete="off" required />
+          <button class="btn" type="submit">Check it</button>
+        </form>
+        <p class="muted">Try a sample code:</p>
+        <p>
+          {Object.keys(demoCodes).map((c) => (
+            <button class="btn ghost sample" type="button" data-code={c} style="margin:0 .4rem .4rem 0;padding:.4rem 1rem">{c}</button>
+          ))}
+        </p>
+        <p>
+          <a class="btn" href="/brands#pilot">Request a pilot</a>
+          <a class="btn ghost" href={whatsappLink('Hi True Tag, I saw the demo and want to enquire.')}>Enquire on WhatsApp</a>
+        </p>
+      </div>
+      <div id="out" aria-live="polite">
+        <div class="card muted">Enter a code to see the result.</div>
+      </div>
+    </div>
+  </section>
+  <script define:vars={{ demoCodes, verdictCopy }}>
+    const out = document.getElementById('out');
+    const input = document.getElementById('code');
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const icons = { genuine: '\u2713', suspicious: '!', invalid: '?' };
+    function show(raw) {
+      const code = raw.trim().toUpperCase();
+      if (!code) return;
+      const hit = demoCodes[code];
+      const verdict = hit ? hit.verdict : 'invalid';
+      const c = verdictCopy[verdict];
+      out.innerHTML = `<div class="result ${verdict}" role="status">
+        <span class="badge"><span aria-hidden="true">${icons[verdict]}</span> ${c.title}</span>
+        <p class="muted" style="margin:.6rem 0 0">Code: <strong>${esc(code)}</strong></p>
+        <h3>${esc(hit ? hit.product : c.title)}</h3>
+        <p>${c.text}</p>
+        ${hit ? `<p class="muted">${esc(hit.detail)}</p>` : ''}
+        <p class="advice"><strong>What to do:</strong> ${c.advice}</p></div>`;
+    }
+    document.getElementById('demo-form').addEventListener('submit', (e) => { e.preventDefault(); show(input.value); });
+    document.querySelectorAll('.sample').forEach((b) => b.addEventListener('click', () => { input.value = b.dataset.code; show(b.dataset.code); }));
+    const q = new URLSearchParams(location.search).get('code');
+    if (q) { input.value = q; show(q); }
+  </script>
+</Base>

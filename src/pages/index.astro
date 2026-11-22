@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import Result from '../components/Result.astro';
+import { site, whatsappLink, demoCodes } from '../content/site';
+const sample = demoCodes['TT-DEMO-1001'];
+---
+<Base title="Is it genuine? Find out before you buy.">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Free for shoppers. No app needed.</p>
+        <h1 data-i18n="hero.title">Is it genuine? Find out before you buy.</h1>
+        <p class="muted" data-i18n="hero.sub">Check alcohol and cigarettes in seconds. Free, no app needed.</p>
+        <form class="verify-box" action="/demo" method="get">
+          <label for="code" style="position:absolute;left:-9999px">Product code</label>
+          <input id="code" name="code" placeholder="Type the code, e.g. TT-DEMO-1001" autocomplete="off" required />
+          <button class="btn" type="submit">Check it</button>
+        </form>
+        <p><a href={whatsappLink('Hi True Tag, I want to check a product.')}>Or check on WhatsApp</a></p>
+      </div>
+      <div aria-label="Sample result">
+        <p class="eyebrow">What you will see</p>
+        <Result verdict="genuine" product={sample.product} detail={sample.detail} code="TT-DEMO-1001" />
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <p class="eyebrow" style="color:#bcd3ca">The problem</p>
+      <h2>Fake alcohol and cigarettes cost lives and billions.</h2>
+      <div class="grid three" style="margin-top:2rem">
+        {site.figures.map((f) => (
+          <div><div class="figure">{f.value}</div><p class="muted">{f.label}</p></div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>One tag. Three promises.</h2>
+      <div class="grid three">
+        <div class="card"><h3>Scan to engage</h3><p>Every unit carries its own code. A scan gives a clear verdict and, for brands, a reason to talk to their customers.</p></div>
+        <div class="card"><h3>No app needed</h3><p>Use your phone camera, WhatsApp or type the code. Light pages that work on slow data.</p></div>
+        <div class="card"><h3>Government-ready</h3><p>Built around unique, non-sequential codes so it can connect to track-and-trace systems as they arrive.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wrap grid two">
+      <div class="card">
+        <p class="eyebrow">For shoppers</p>
+        <h3>Check a product now</h3>
+        <p>See how the three results work and what to do if something looks wrong.</p>
+        <a class="btn dark" href="/verify">How to verify</a>
+      </div>
+      <div class="card">
+        <p class="eyebrow">For brands</p>
+        <h3>See it working, then start a pilot</h3>
+        <p>Try the demo scan page, then request a pilot for one product.</p>
+        <a class="btn" href="/brands#pilot">Request a pilot</a>
+        <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire.')}>WhatsApp enquiry</a>
+      </div>
+    </div>
+  </section>
+</Base>

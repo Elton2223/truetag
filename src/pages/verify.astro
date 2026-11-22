@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import Result from '../components/Result.astro';
+import { whatsappLink } from '../content/site';
+---
+<Base title="How to verify a product">
+  <div class="wrap page-head">
+    <p class="eyebrow">For shoppers</p>
+    <h1>How to verify a product</h1>
+    <p class="muted">It takes seconds and it is free.</p>
+  </div>
+  <section style="padding-top:1rem">
+    <div class="wrap">
+      <h2>Three ways to check</h2>
+      <ol class="steps">
+        <li><strong>Scan the QR code.</strong> Open your phone camera and point it at the code on the pack.</li>
+        <li><strong>WhatsApp or SMS.</strong> <span class="muted">Coming soon.</span> Send the code to us and get the verdict back. <a href={whatsappLink('Hi True Tag, I want to check a product.')}>Message us on WhatsApp</a>.</li>
+        <li><strong>Type the code.</strong> Enter it on the <a href="/demo">check page</a>.</li>
+      </ol>
+    </div>
+  </section>
+  <section>
+    <div class="wrap">
+      <h2>What the results mean</h2>
+      <div class="grid three">
+        <Result verdict="genuine" />
+        <Result verdict="suspicious" />
+        <Result verdict="invalid" />
+      </div>
+    </div>
+  </section>
+  <section class="band">
+    <div class="wrap">
+      <h2>If a product looks suspicious</h2>
+      <ul>
+        <li>Do not drink, smoke or share it until you are sure.</li>
+        <li>Note where and when you bought it, and keep the pack.</li>
+        <li>Report it to us and to the shop owner. Serious harm: contact your nearest clinic or the SAPS.</li>
+      </ul>
+    </div>
+  </section>
+</Base>

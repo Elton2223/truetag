@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, whatsappLink } from '../content/site';
+---
+<Base title="For brands">
+  <div class="wrap page-head">
+    <p class="eyebrow">For brands</p>
+    <h1>Protect your customers and your name</h1>
+    <p class="muted">Give every pack its own code. Know when and where it is checked. Act on fakes with evidence.</p>
+    <a class="btn" href="#pilot">Request a pilot</a>
+    <a class="btn ghost" href="/demo">Try the demo</a>
+  </div>
+  <section>
+    <div class="wrap">
+      <h2>How a pilot works</h2>
+      <ol class="steps">
+        <li><strong>Learn.</strong> See how it works and the core benefits.</li>
+        <li><strong>Enquire.</strong> Send the pilot form or message us on WhatsApp.</li>
+        <li><strong>Pilot.</strong> One product, unique codes, first scans.</li>
+        <li><strong>Dashboard.</strong> Scans, flags and locations.</li>
+      </ol>
+    </div>
+  </section>
+  <section class="band">
+    <div class="wrap">
+      <h2>Reports your team gets</h2>
+      <div class="grid two" style="margin-top:1.5rem">
+        <div><h3>Scan summary</h3><p class="muted">Genuine, suspicious and invalid split by product, batch, province and channel.</p></div>
+        <div><h3>Suspicious activity list</h3><p class="muted">Flagged batches and codes with the reason, place, time and status.</p></div>
+        <div><h3>Consumer reports inbox</h3><p class="muted">Shopper reports of suspected fakes. You set the status and the shopper is thanked.</p></div>
+        <div><h3>Monthly PDF summary</h3><p class="muted">Five headline numbers, top three findings and suggested actions.</p></div>
+      </div>
+      <p class="muted" style="margin-top:1.5rem">Plans and pricing are shared during your pilot conversation.</p>
+    </div>
+  </section>
+  <section id="pilot">
+    <div class="wrap grid two">
+      <div>
+        <h2>Request a pilot</h2>
+        <p class="muted">Tell us about your product. We reply by email, or you can message us directly on WhatsApp.</p>
+        <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire about a pilot.')}>WhatsApp enquiry</a>
+      </div>
+      <form class="pilot card" id="pilot-form">
+        <label>Company name<input name="company" required /></label>
+        <label>Your name<input name="name" required /></label>
+        <label>Email<input name="email" type="email" required /></label>
+        <label>Product type
+          <select name="type"><option>Alcohol</option><option>Cigarettes</option><option>Other</option></select>
+        </label>
+        <label>Tell us more<textarea name="msg" rows="3"></textarea></label>
+        <button class="btn" type="submit">Send request</button>
+        <p class="muted" style="font-size:.85rem;margin:0">This opens your email app with the details filled in. We only use them to reply to you.</p>
+      </form>
+    </div>
+  </section>
+  <script define:vars={{ email: site.email }}>
+    document.getElementById('pilot-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      const body = ['Company: ' + f.get('company'), 'Name: ' + f.get('name'), 'Email: ' + f.get('email'), 'Product: ' + f.get('type'), '', f.get('msg')].join('\n');
+      location.href = 'mailto:' + email + '?subject=' + encodeURIComponent('Pilot request: ' + f.get('company')) + '&body=' + encodeURIComponent(body);
+    });
+  </script>
+</Base>

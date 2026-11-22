@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, whatsappLink } from '../content/site';
+---
+<Base title="Contact">
+  <div class="wrap page-head"><h1>Contact us</h1></div>
+  <section style="padding-top:1rem">
+    <div class="wrap grid two">
+      <div class="card">
+        <h3>Email</h3><p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+        <h3>WhatsApp</h3><p><a href={whatsappLink()}>Start a chat</a></p>
+        <h3>Address</h3><p>{site.address}</p>
+      </div>
+      <div class="card">
+        <h3>Report a suspected fake</h3>
+        <p>Online reporting with photos is coming. For now, email us the code, where you bought it and a photo of the pack.</p>
+        <a class="btn" href={`mailto:${site.email}?subject=Suspected%20fake%20product`}>Email a report</a>
+      </div>
+    </div>
+  </section>
+</Base>
