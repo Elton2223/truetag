@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { whatsappLink } from '../content/site';
+import Checker from '../components/Checker.astro';
+import { whatsappLink, whatsappReady } from '../content/site';
 
 export const prerender = false;
 const ok = Astro.url.searchParams.get('ok');
@@ -10,39 +11,54 @@ const err = Astro.url.searchParams.get('err');
 <Base title="For brands">
   <div class="wrap page-head">
     <h1>Protect your brand</h1>
+    <p class="muted" style="max-width:560px">A unique code on every pack. A live view of where it is checked. Evidence when fakes appear.</p>
     <div class="cta-row">
       <a class="btn" href="#pilot">Request a pilot</a>
-      <a class="btn ghost" href="/demo">Try the demo</a>
-      <a class="btn ghost" href="/portal/login">Brand portal</a>
+      <a class="btn ghost" href="/portal/login">Brand login</a>
     </div>
   </div>
   <section>
     <div class="wrap">
+      <div class="section-title"><span class="eyebrow">How it works</span><h2>From pilot to proof</h2></div>
       <ol class="timeline">
-        <li><strong>Enquire</strong><span class="muted">Form or WhatsApp</span></li>
-        <li><strong>Pilot</strong><span class="muted">One product, first scans</span></li>
-        <li><strong>Dashboard</strong><span class="muted">Scans, flags, places</span></li>
-        <li><strong>Act</strong><span class="muted">Evidence on fakes</span></li>
+        <li><strong>Request a pilot</strong><span class="muted">Tell us about one product.</span></li>
+        <li><strong>We vet your company</strong><span class="muted">Company registration and relevant licences.</span></li>
+        <li><strong>Generate and print codes</strong><span class="muted">Create batches in the portal and download the printer file.</span></li>
+        <li><strong>Watch the market</strong><span class="muted">Scans, flags, places and shopper reports.</span></li>
       </ol>
     </div>
   </section>
   <section class="band">
-    <div class="wrap grid three" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
-      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="chart" /></span><h3>Scan summary</h3></div>
-      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="flag" /></span><h3>Suspicious activity</h3></div>
-      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="inbox" /></span><h3>Consumer reports</h3></div>
-      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="pdf" /></span><h3>Monthly PDF</h3></div>
+    <div class="wrap">
+      <h2 style="margin-bottom:2rem">Inside the brand portal</h2>
+      <div class="grid three" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="chart" /></span><h3>Scan dashboard</h3><p class="muted">Every check by product, batch, channel and city.</p></div>
+        <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="flag" /></span><h3>Suspicious codes</h3><p class="muted">Codes scanned too often or in too many places.</p></div>
+        <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="inbox" /></span><h3>Shopper reports</h3><p class="muted">Suspected fakes sent in by the public.</p></div>
+        <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="gift" /></span><h3>Reward campaigns</h3><p class="muted">Thank shoppers who verify a genuine pack.</p></div>
+        <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="form" /></span><h3>Code export</h3><p class="muted">CSV and QR links ready for your printer.</p></div>
+        <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="pdf" /></span><h3>Monthly summary</h3><p class="muted">Headline numbers and what to do next.</p></div>
+      </div>
     </div>
   </section>
-  <section id="pilot">
+  <section>
+    <div class="wrap grid two" style="align-items:start">
+      <div>
+        <h2>See what your customers see</h2>
+        <p class="muted">Try the checker with a demo code.</p>
+      </div>
+      <Checker id="brands-checker" demo />
+    </div>
+  </section>
+  <section id="pilot" style="padding-top:0">
     <div class="wrap grid two">
       <div>
         <h2>Request a pilot</h2>
         <p class="muted">We vet company registration and relevant licences before issuing codes.</p>
-        <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire about a pilot.')}>WhatsApp us</a>
+        {whatsappReady && <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire about a pilot.')}>WhatsApp us</a>}
       </div>
       <div>
-        {ok && <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--ok)">Thanks — we received your pilot request.</div>}
+        {ok && <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--ok)">Thanks, we received your pilot request.</div>}
         {err && <div class="card" style="margin-bottom:1rem;border-left:4px solid var(--bad)">Please fill in company, name and email.</div>}
         <form class="pilot card" method="post" action="/api/v1/pilots">
           <label>Company<input name="company" required /></label>

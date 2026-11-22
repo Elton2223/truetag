@@ -1,14 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { site, whatsappLink } from '../content/site';
+import { site, whatsappLink, whatsappReady } from '../content/site';
 ---
 <Base title="Contact">
   <div class="wrap page-head"><h1>Contact</h1></div>
   <section style="padding-top:1rem">
     <div class="wrap grid three">
       <a class="card tile" href={`mailto:${site.email}`} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="mail" /></span><h3>Email</h3><p>{site.email}</p></a>
-      <a class="card tile" href={whatsappLink()} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="chat" /></span><h3>WhatsApp</h3><p>Start a chat</p></a>
+      {whatsappReady && <a class="card tile" href={whatsappLink()} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="chat" /></span><h3>WhatsApp</h3><p>Start a chat</p></a>}
       <a class="card tile" href="/report" style="text-decoration:none;color:inherit"><span class="ico"><Icon name="flag" /></span><h3>Report a fake</h3><p>Send the code and details</p></a>
     </div>
     <div class="wrap" style="margin-top:1.5rem"><p class="muted">{site.address}</p></div>

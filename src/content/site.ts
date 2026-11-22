@@ -44,6 +44,8 @@ export const site = {
   ],
 };
 
+export const whatsappReady = Boolean(site.whatsappNumber);
+
 export const whatsappLink = (text = 'Hi True Tag, I would like to know more.') =>
   site.whatsappNumber
     ? `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(text)}`

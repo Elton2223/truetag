@@ -1,88 +1,29 @@
 ---
 import Base from '../layouts/Base.astro';
-import Result from '../components/Result.astro';
-import Icon from '../components/Icon.astro';
-import { whatsappLink } from '../content/site';
+import Checker from '../components/Checker.astro';
+import { verdictCopy } from '../content/site';
 
 export const prerender = false;
-
-const initial = Astro.url.searchParams.get('code') || '';
 ---
-<Base title="How to verify">
-  <div class="wrap page-head"><h1>How to verify</h1>
-    <p class="muted">Genuine means issued by the brand through True Tag and behaving normally — not a government certificate.</p>
+<Base title="Check a product">
+  <div class="wrap page-head" style="max-width:720px">
+    <h1>Check a product</h1>
+    <p class="muted">Scan the QR on the pack, or type the code. Free, no app needed.</p>
   </div>
   <section style="padding-top:1rem">
-    <div class="wrap grid three">
-      <div class="card tile"><span class="ico"><Icon name="scan" /></span><h3>Scan</h3><p>Point your camera at the QR code — it opens this page with the code filled in.</p></div>
-      <a class="card tile" href={whatsappLink('Hi True Tag, I want to check a product. Code: ')} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="chat" /></span><h3>WhatsApp</h3><p>Send us the code. SMS coming soon.</p></a>
-      <div class="card tile"><span class="ico"><Icon name="type" /></span><h3>Type</h3><p>Enter the code below for an instant check.</p></div>
+    <div class="wrap" style="max-width:720px">
+      <Checker id="verify-checker" demo fromUrl />
+      <p class="muted" style="margin-top:1rem">Suspect a fake without a code? <a href="/report">Report it</a>.</p>
     </div>
   </section>
   <section style="padding-top:0">
-    <div class="wrap grid two">
-      <form class="verify-box" id="verify-form" style="margin-top:0">
-        <label for="code" class="sr-only">Product code</label>
-        <input id="code" name="code" placeholder="TT-XXXX-XXXX-XXXX" autocomplete="off" required value={initial} />
-        <button class="btn" type="submit">Check it</button>
-      </form>
-      <div id="out" aria-live="polite">
-        {initial ? <div class="card checking" aria-label="Checking"><i></i><i></i><i></i></div> : <div class="card muted center" style="padding:2rem">Enter a code to see the live verdict.</div>}
+    <div class="wrap">
+      <h2>What the results mean</h2>
+      <div class="verdict-row">
+        <div class="g"><strong>Genuine</strong><span>{verdictCopy.genuine.text}</span></div>
+        <div class="s"><strong>Suspicious</strong><span>{verdictCopy.suspicious.text}</span></div>
+        <div class="n"><strong>Not found</strong><span>No record of this code. It does not prove a fake, only that the brand may not be on True Tag.</span></div>
       </div>
     </div>
-    <div class="wrap" style="margin-top:1rem">
-      <a class="btn ghost" href="/report">Report a suspected fake</a>
-    </div>
   </section>
-  <section style="padding-top:0">
-    <div class="wrap grid three">
-      <Result verdict="genuine" />
-      <Result verdict="suspicious" />
-      <Result verdict="invalid" />
-    </div>
-    <div class="wrap">
-      <p class="muted" style="margin-top:1.5rem;max-width:720px">Not found does not prove a product is fake — only that True Tag has no record. A product only verifies if its brand is onboarded.</p>
-    </div>
-  </section>
-  <script>
-    var out = document.getElementById('out');
-    var input = document.getElementById('code');
-    var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-    var icons = { genuine: '\u2713', suspicious: '!', invalid: '?' };
-    var titles = { genuine: 'Genuine', suspicious: 'Suspicious', invalid: 'Not found' };
-
-    function paint(data) {
-      var verdict = data.verdict || 'invalid';
-      out.innerHTML = '<div class="result ' + verdict + '" role="status">' +
-        '<span class="badge pop"><span aria-hidden="true">' + (icons[verdict] || '?') + '</span> ' + esc(titles[verdict] || 'Not found') + '</span>' +
-        '<p class="muted" style="margin:.6rem 0 0">Code: <strong>' + esc(data.code || '') + '</strong></p>' +
-        (data.product ? '<h3>' + esc(data.product) + '</h3>' : '') +
-        (data.brand ? '<p class="muted" style="margin:0 0 .4rem">' + esc(data.brand) + (data.batch ? ' · ' + esc(data.batch) : '') + '</p>' : '') +
-        '<p style="margin-bottom:.4rem">' + esc(data.detail || '') + '</p>' +
-        (data.advice ? '<p class="advice">' + esc(data.advice) + '</p>' : '') +
-        '</div>';
-    }
-
-    function show(raw) {
-      var code = String(raw || '').trim();
-      if (!code) return;
-      out.innerHTML = '<div class="card checking" aria-label="Checking"><i></i><i></i><i></i></div>';
-      fetch('/api/v1/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code, channel: 'web' }),
-      })
-        .then(function (r) { return r.json(); })
-        .then(paint)
-        .catch(function () {
-          out.innerHTML = '<div class="card"><p>Could not reach the registry.</p></div>';
-        });
-    }
-
-    document.getElementById('verify-form').addEventListener('submit', function (e) {
-      e.preventDefault();
-      show(input.value);
-    });
-    if (input.value) show(input.value);
-  </script>
 </Base>

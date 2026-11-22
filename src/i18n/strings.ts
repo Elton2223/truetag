@@ -4,8 +4,10 @@ export type Lang = keyof typeof languages;
 
 export const strings: Record<Lang, Record<string, string>> = {
   en: {
-    'nav.verify': 'How to verify',
+    'nav.verify': 'Check a product',
     'nav.demo': 'Demo scan',
+    'nav.report': 'Report a fake',
+    'nav.login': 'Brand login',
     'nav.brands': 'For brands',
     'nav.about': 'About',
     'nav.cta': 'Request a pilot',
@@ -28,3 +30,6 @@ export const strings: Record<Lang, Record<string, string>> = {
     'hero.sub': 'Kontroleer alkohol en sigarette in sekondes. Gratis, geen app nodig.',
   },
 };
+
+// The switcher stays hidden until isiZulu and isiXhosa have real translations.
+export const languageSwitcherEnabled = false;

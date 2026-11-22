@@ -1,0 +1,171 @@
+---
+import Icon from './Icon.astro';
+import { site, whatsappLink } from '../content/site';
+interface Props { demo?: boolean; fromUrl?: boolean; id?: string; }
+const { demo = false, fromUrl = false, id = 'checker' } = Astro.props;
+const waReady = Boolean(site.whatsappNumber);
+const waHref = waReady ? whatsappLink('Hi True Tag, I want to check a product. Code: ') : '';
+const samples = ['TT-DEMO-1001', 'TT-DEMO-2002', 'TT-DEMO-3003'];
+---
+<div class="checker card" data-checker data-wa={waHref} data-fromurl={fromUrl ? '1' : ''} id={id}>
+  <div class="tabs" role="tablist" aria-label="Ways to check">
+    <button type="button" role="tab" aria-selected="false" data-tab="scan"><Icon name="scan" /> Scan QR</button>
+    <button type="button" role="tab" aria-selected="true" data-tab="type"><Icon name="type" /> Type code</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="wa"><Icon name="chat" /> WhatsApp</button>
+    <button type="button" role="tab" aria-selected="false" data-tab="sms"><Icon name="phone" /> SMS</button>
+  </div>
+
+  <div class="panel-tab" data-panel="scan" hidden>
+    <div class="cam" data-cam-box hidden><video data-video playsinline muted></video><span class="beam"></span></div>
+    <p class="muted" data-scan-msg>Point your phone camera at the QR code on the pack.</p>
+    <button type="button" class="btn dark" data-start-cam>Open camera</button>
+  </div>
+
+  <div class="panel-tab" data-panel="type">
+    <form class="verify-box" data-form style="margin:0">
+      <label class="sr-only" for={`${id}-code`}>Product code</label>
+      <input id={`${id}-code`} name="code" data-code placeholder="TT-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" required />
+      <button class="btn" type="submit">Check</button>
+    </form>
+  </div>
+
+  <div class="panel-tab" data-panel="wa" hidden>
+    {waReady
+      ? <><p class="muted">Send us the code on WhatsApp and get the verdict back.</p><a class="btn dark" href={waHref}>Open WhatsApp</a></>
+      : <p class="muted"><strong>Coming soon.</strong> For now, scan the QR or type the code.</p>}
+  </div>
+  <div class="panel-tab" data-panel="sms" hidden>
+    <p class="muted"><strong>Coming soon.</strong> For now, scan the QR or type the code.</p>
+  </div>
+
+  <div class="checker-out" data-out aria-live="polite"></div>
+
+  {demo && (
+    <p class="demo-row" id="demo">
+      <span class="muted">Try a demo code:</span>
+      {samples.map((c) => <button type="button" class="chip-btn" data-sample={c}>{c}</button>)}
+    </p>
+  )}
+</div>
+
+<script>
+  const esc = (s: unknown) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
+  const icons: Record<string, string> = { genuine: '\u2713', suspicious: '!', invalid: '?' };
+  const titles: Record<string, string> = { genuine: 'Genuine', suspicious: 'Suspicious', invalid: 'Not found' };
+
+  function extractCode(text: string): string {
+    try {
+      const u = new URL(text);
+      const c = u.searchParams.get('code');
+      if (c) return c;
+    } catch {}
+    const m = text.toUpperCase().match(/TT-[0-9A-Z]{4}(?:-[0-9A-Z]{4}){2}|TT-DEMO-\d+/);
+    return m ? m[0] : text.trim();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-checker]').forEach((root) => {
+    const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const out = $('[data-out]');
+    const input = $<HTMLInputElement>('[data-code]');
+    let stream: MediaStream | null = null;
+    let scanning = false;
+
+    const setTab = (name: string) => {
+      root.querySelectorAll<HTMLElement>('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+      root.querySelectorAll<HTMLElement>('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== name));
+      if (name !== 'scan') stopCam();
+      if (name === 'type') input.focus({ preventScroll: true });
+    };
+    root.querySelectorAll<HTMLElement>('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab!)));
+
+    function paint(d: any) {
+      const v = d.verdict || 'invalid';
+      let actions = '';
+      if (v !== 'genuine') actions += `<a class="btn" href="/report?code=${encodeURIComponent(d.code || '')}">Report this product</a>`;
+      if (d.rewardEligible && d.rewardToken) actions += `<button class="btn" data-claim="${esc(d.rewardToken)}">Claim your reward</button>`;
+      actions += `<button class="btn ghost" data-again>Check another</button>`;
+      out.innerHTML = `<div class="result ${v}" role="status" style="animation:slidein .5s ease both">
+        <span class="badge pop"><span aria-hidden="true">${icons[v] || '?'}</span> ${esc(titles[v] || 'Not found')}</span>
+        <p class="muted" style="margin:.6rem 0 0">Code: <strong>${esc(d.code)}</strong></p>
+        ${d.product ? `<h3>${esc(d.product)}</h3>` : ''}
+        ${d.brand ? `<p class="muted" style="margin:0 0 .4rem">${esc(d.brand)}${d.batch ? ' \u00b7 ' + esc(d.batch) : ''}</p>` : ''}
+        <p style="margin-bottom:.4rem">${esc(d.detail)}</p>
+        ${d.advice ? `<p class="advice">${esc(d.advice)}</p>` : ''}
+        <div class="cta-row" style="margin-top:1rem">${actions}</div>
+        <p class="claim-msg muted" data-claim-msg></p></div>`;
+      out.querySelector('[data-again]')?.addEventListener('click', () => { out.innerHTML = ''; input.value = ''; setTab('type'); });
+      out.querySelector<HTMLElement>('[data-claim]')?.addEventListener('click', async (e) => {
+        const btn = e.currentTarget as HTMLButtonElement;
+        btn.disabled = true;
+        const msg = out.querySelector('[data-claim-msg]')!;
+        try {
+          const r = await fetch('/api/v1/rewards/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: btn.dataset.claim }) });
+          const j = await r.json();
+          msg.textContent = r.ok ? `${j.title || 'Reward claimed'}${j.message ? ': ' + j.message : ''}` : (j.error || 'Could not claim the reward.');
+        } catch { msg.textContent = 'Could not claim the reward. Try again.'; btn.disabled = false; }
+      });
+    }
+
+    async function check(raw: string, channel = 'web') {
+      const code = extractCode(raw);
+      if (!code) return;
+      input.value = code;
+      out.innerHTML = '<div class="card checking" aria-label="Checking"><i></i><i></i><i></i></div>';
+      try {
+        const r = await fetch('/api/v1/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, channel }) });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error || 'Failed');
+        paint(d);
+      } catch (e: any) {
+        out.innerHTML = `<div class="card"><p>${esc(e.message || 'Could not reach the registry.')}</p></div>`;
+      }
+    }
+
+    $('[data-form]').addEventListener('submit', (e) => { e.preventDefault(); check(input.value); });
+    root.querySelectorAll<HTMLElement>('[data-sample]').forEach((b) => b.addEventListener('click', () => { setTab('type'); check(b.dataset.sample!, 'demo'); }));
+
+    function stopCam() {
+      scanning = false;
+      stream?.getTracks().forEach((t) => t.stop());
+      stream = null;
+      $('[data-cam-box]').hidden = true;
+      $('[data-start-cam]').hidden = false;
+    }
+    $('[data-start-cam]').addEventListener('click', async () => {
+      const msg = $('[data-scan-msg]');
+      const Detector = (window as any).BarcodeDetector;
+      if (!Detector || !navigator.mediaDevices?.getUserMedia) {
+        msg.textContent = 'This browser cannot scan here. Open your phone camera app and point it at the QR on the pack, or type the code.';
+        return;
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      } catch {
+        msg.textContent = 'Camera access was blocked. Allow it, or type the code instead.';
+        return;
+      }
+      const video = $<HTMLVideoElement>('[data-video]');
+      video.srcObject = stream;
+      await video.play();
+      $('[data-cam-box]').hidden = false;
+      $('[data-start-cam]').hidden = true;
+      msg.textContent = 'Hold the QR code inside the frame.';
+      const det = new Detector({ formats: ['qr_code'] });
+      scanning = true;
+      const tick = async () => {
+        if (!scanning) return;
+        try {
+          const codes = await det.detect(video);
+          if (codes[0]?.rawValue) { stopCam(); check(codes[0].rawValue, 'web'); return; }
+        } catch {}
+        requestAnimationFrame(tick);
+      };
+      tick();
+    });
+
+    if (root.dataset.fromurl) {
+      const q = new URLSearchParams(location.search).get('code');
+      if (q) check(q);
+    }
+  });
+</script>
