@@ -1,16 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../content/site';
+const short = (s: string) => s.split('. ').slice(0, 1).join('. ').replace(/\.?$/, '.');
 ---
 <Base title="About">
-  <div class="wrap page-head"><p class="eyebrow">About</p><h1>{site.aboutHeadline}</h1><p class="muted" style="max-width:720px">{site.description}</p></div>
+  <div class="wrap page-head"><h1>{site.aboutHeadline}</h1></div>
   <section style="padding-top:1rem">
-    <div class="wrap"><p style="max-width:760px;font-size:1.1rem">{site.story}</p></div>
+    <div class="wrap grid two">
+      <div class="card tile"><h3>Mission</h3><p>{site.mission}</p></div>
+      <div class="card tile"><h3>Vision</h3><p>{site.vision}</p></div>
+    </div>
   </section>
   <section style="padding-top:0">
-    <div class="wrap grid two">
-      <div class="card"><h2>Mission</h2><p>{site.mission}</p></div>
-      <div class="card"><h2>Vision</h2><p>{site.vision}</p></div>
+    <div class="wrap">
+      <ul class="chips">{site.differentiators.map((d) => <li>{d}</li>)}</ul>
+      <details class="more"><summary>Our story</summary><p style="margin-top:.8rem;max-width:720px">{site.description} {site.story}</p></details>
     </div>
   </section>
   <section>
@@ -18,26 +22,15 @@ import { site } from '../content/site';
       <h2>Founders</h2>
       <div class="grid two">
         {site.founders.map((f) => (
-          <div class="card">
+          <div class="card founder">
             <div class="photo" role="img" aria-label={`Photo of ${f.name} to be added`}>Photo to be added</div>
-            <h3 style="margin-top:1rem">{f.name}</h3>
-            <p class="eyebrow">{f.role}</p>
-            <p>{f.bio}</p>
+            <h3 style="margin:0">{f.name}</h3>
+            <p class="eyebrow" style="margin:0">{f.role}</p>
+            <p>{short(f.bio)}</p>
+            <details class="more"><summary>Read more</summary><p style="margin-top:.6rem">{f.bio}</p></details>
           </div>
         ))}
       </div>
-    </div>
-  </section>
-  <section>
-    <div class="wrap">
-      <h2>What sets us apart</h2>
-      <ul>{site.differentiators.map((d) => <li>{d}</li>)}</ul>
-    </div>
-  </section>
-  <section class="band">
-    <div class="wrap">
-      <h2>Get in touch</h2>
-      <p><a style="color:#fff" href={`mailto:${site.email}`}>{site.email}</a><br />{site.address}</p>
     </div>
   </section>
 </Base>

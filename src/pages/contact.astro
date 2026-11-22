@@ -1,21 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import { site, whatsappLink } from '../content/site';
 ---
 <Base title="Contact">
-  <div class="wrap page-head"><h1>Contact us</h1></div>
+  <div class="wrap page-head"><h1>Contact</h1></div>
   <section style="padding-top:1rem">
-    <div class="wrap grid two">
-      <div class="card">
-        <h3>Email</h3><p><a href={`mailto:${site.email}`}>{site.email}</a></p>
-        <h3>WhatsApp</h3><p><a href={whatsappLink()}>Start a chat</a></p>
-        <h3>Address</h3><p>{site.address}</p>
-      </div>
-      <div class="card">
-        <h3>Report a suspected fake</h3>
-        <p>Online reporting with photos is coming. For now, email us the code, where you bought it and a photo of the pack.</p>
-        <a class="btn" href={`mailto:${site.email}?subject=Suspected%20fake%20product`}>Email a report</a>
-      </div>
+    <div class="wrap grid three">
+      <a class="card tile" href={`mailto:${site.email}`} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="mail" /></span><h3>Email</h3><p>{site.email}</p></a>
+      <a class="card tile" href={whatsappLink()} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="chat" /></span><h3>WhatsApp</h3><p>Start a chat</p></a>
+      <a class="card tile" href={`mailto:${site.email}?subject=Suspected%20fake%20product`} style="text-decoration:none;color:inherit"><span class="ico"><Icon name="flag" /></span><h3>Report a fake</h3><p>Send the code and a photo</p></a>
     </div>
+    <div class="wrap" style="margin-top:1.5rem"><p class="muted">{site.address}</p></div>
   </section>
 </Base>

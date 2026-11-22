@@ -6,10 +6,9 @@ const c = verdictCopy[verdict];
 const icon = { genuine: '\u2713', suspicious: '!', invalid: '?' }[verdict];
 ---
 <div class={`result ${verdict}`} role="status">
-  <span class="badge"><span aria-hidden="true">{icon}</span> {c.title}</span>
+  <span class="badge pop"><span aria-hidden="true">{icon}</span> {c.title}</span>
   {code && <p class="muted" style="margin:.6rem 0 0">Code: <strong>{code}</strong></p>}
-  <h3>{product ?? c.title}</h3>
-  <p>{c.text}</p>
-  {detail && <p class="muted">{detail}</p>}
-  <p class="advice"><strong>What to do:</strong> {c.advice}</p>
+  {product && <h3>{product}</h3>}
+  <p style="margin-bottom:.4rem">{detail || c.text}</p>
+  {c.advice && <p class="advice">{c.advice}</p>}
 </div>

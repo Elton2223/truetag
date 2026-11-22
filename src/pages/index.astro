@@ -1,68 +1,75 @@
 ---
 import Base from '../layouts/Base.astro';
 import Result from '../components/Result.astro';
-import { site, whatsappLink, demoCodes } from '../content/site';
+import Icon from '../components/Icon.astro';
+import { site, whatsappLink, demoCodes, verdictCopy } from '../content/site';
 const sample = demoCodes['TT-DEMO-1001'];
 ---
 <Base title="Is it genuine? Find out before you buy.">
   <section class="hero">
+    <div class="blob a"></div><div class="blob b"></div>
     <div class="wrap hero-grid">
       <div>
-        <p class="eyebrow">Free for shoppers. No app needed.</p>
         <h1 data-i18n="hero.title">Is it genuine? Find out before you buy.</h1>
-        <p class="muted" data-i18n="hero.sub">Check alcohol and cigarettes in seconds. Free, no app needed.</p>
         <form class="verify-box" action="/demo" method="get">
-          <label for="code" style="position:absolute;left:-9999px">Product code</label>
-          <input id="code" name="code" placeholder="Type the code, e.g. TT-DEMO-1001" autocomplete="off" required />
+          <label for="code" class="sr-only">Product code</label>
+          <input id="code" name="code" placeholder="Type the code" autocomplete="off" required />
           <button class="btn" type="submit">Check it</button>
         </form>
-        <p><a href={whatsappLink('Hi True Tag, I want to check a product.')}>Or check on WhatsApp</a></p>
+        <a href={whatsappLink('Hi True Tag, I want to check a product.')}>Or check on WhatsApp</a>
       </div>
-      <div aria-label="Sample result">
-        <p class="eyebrow">What you will see</p>
-        <Result verdict="genuine" product={sample.product} detail={sample.detail} code="TT-DEMO-1001" />
+      <div>
+        <div class="hero-card" id="hero-card" aria-live="off">
+          <Result verdict="genuine" product={sample.product} detail={sample.detail} code="TT-DEMO-1001" />
+        </div>
+        <div class="dots" id="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
       </div>
     </div>
   </section>
 
   <section class="band">
-    <div class="wrap">
-      <p class="eyebrow" style="color:#b9d4da">The problem</p>
-      <h2>Fake alcohol and cigarettes cost lives and billions.</h2>
-      <div class="grid three" style="margin-top:2rem">
-        {site.figures.map((f) => (
-          <div><div class="figure">{f.value}</div><p class="muted">{f.label}</p></div>
-        ))}
-      </div>
+    <div class="wrap grid three center">
+      {site.figures.map((f) => (
+        <div class="figure-wrap">
+          <div class="figure" data-count={f.count} data-prefix={f.prefix} data-suffix={f.suffix}>{f.prefix}{f.count}{f.suffix}</div>
+          <p class="muted">{f.label}</p>
+        </div>
+      ))}
     </div>
   </section>
 
   <section>
-    <div class="wrap">
-      <h2>One tag. Three promises.</h2>
-      <div class="grid three">
-        <div class="card"><h3>Scan to engage</h3><p>Every unit carries its own code. A scan gives a clear verdict and, for brands, a reason to talk to their customers.</p></div>
-        <div class="card"><h3>No app needed</h3><p>Use your phone camera, WhatsApp or type the code. Light pages that work on slow data.</p></div>
-        <div class="card"><h3>Government-ready</h3><p>Built around unique, non-sequential codes so it can connect to track-and-trace systems as they arrive.</p></div>
-      </div>
+    <div class="wrap grid three">
+      <div class="card tile"><span class="ico"><Icon name="gift" /></span><h3>Scan to engage</h3><p>Verify, then get rewarded.</p></div>
+      <div class="card tile"><span class="ico"><Icon name="phone" /></span><h3>No app needed</h3><p>Camera, WhatsApp or SMS.</p></div>
+      <div class="card tile"><span class="ico"><Icon name="shield" /></span><h3>Government-ready</h3><p>Built for track-and-trace.</p></div>
     </div>
   </section>
 
   <section style="padding-top:0">
-    <div class="wrap grid two">
-      <div class="card">
-        <p class="eyebrow">For shoppers</p>
-        <h3>Check a product now</h3>
-        <p>See how the three results work and what to do if something looks wrong.</p>
-        <a class="btn dark" href="/verify">How to verify</a>
-      </div>
-      <div class="card">
-        <p class="eyebrow">For brands</p>
-        <h3>See it working, then start a pilot</h3>
-        <p>Try the demo scan page, then request a pilot for one product.</p>
+    <div class="wrap center">
+      <div class="cta-row" style="justify-content:center">
+        <a class="btn dark" href="/demo">Check a product</a>
         <a class="btn" href="/brands#pilot">Request a pilot</a>
-        <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire.')}>WhatsApp enquiry</a>
       </div>
     </div>
   </section>
+
+  <script define:vars={{ demoCodes, verdictCopy }}>
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var card = document.getElementById('hero-card');
+    var dots = document.querySelectorAll('#dots i');
+    var codes = Object.keys(demoCodes);
+    var icons = { genuine: '\u2713', suspicious: '!', invalid: '?' };
+    var esc = function (s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+    var i = 0;
+    function render(n) {
+      var code = codes[n], d = demoCodes[code], c = verdictCopy[d.verdict];
+      card.innerHTML = '<div class="result ' + d.verdict + '"><span class="badge pop"><span aria-hidden="true">' + icons[d.verdict] + '</span> ' + c.title + '</span>' +
+        '<p class="muted" style="margin:.6rem 0 0">Code: <strong>' + esc(code) + '</strong></p><h3>' + esc(d.product) + '</h3>' +
+        '<p style="margin-bottom:.4rem">' + esc(d.detail || c.text) + '</p>' + (c.advice ? '<p class="advice">' + esc(c.advice) + '</p>' : '') + '</div>';
+      dots.forEach(function (el, k) { el.classList.toggle('on', k === n); });
+    }
+    if (!reduce) setInterval(function () { i = (i + 1) % codes.length; render(i); }, 3800);
+  </script>
 </Base>

@@ -38,9 +38,9 @@ export const site = {
     },
   ],
   figures: [
-    { value: 'R100bn', label: 'lost to illicit trade in South Africa every year' },
-    { value: '60%+', label: 'of cigarettes sold are estimated to be illicit' },
-    { value: '21', label: 'young people died at Enyobeni Tavern' },
+    { count: 100, prefix: 'R', suffix: 'bn', label: 'lost every year' },
+    { count: 60, prefix: '', suffix: '%+', label: 'of cigarettes illicit' },
+    { count: 21, prefix: '', suffix: '', label: 'lives lost at Enyobeni' },
   ],
 };
 
@@ -55,36 +55,34 @@ export const demoCodes: Record<string, { verdict: Verdict; product: string; deta
   'TT-DEMO-1001': {
     verdict: 'genuine',
     product: 'Sample Reserve Lager 340ml',
-    detail: 'Issued by the brand through True Tag. First scan of this code. Batch B-2026-014.',
+    detail: 'First scan. Batch B-2026-014.',
   },
   'TT-DEMO-2002': {
     verdict: 'suspicious',
     product: 'Sample Premium Cigarettes 20s',
-    detail: 'This code has been checked many times in different places, which is unusual for one pack.',
+    detail: 'Scanned many times in different places.',
   },
   'TT-DEMO-3003': {
     verdict: 'invalid',
     product: 'Unknown product',
-    detail: 'We could not find this code in the True Tag system.',
+    detail: '',
   },
 };
 
 export const verdictCopy: Record<Verdict, { title: string; text: string; advice: string }> = {
   genuine: {
     title: 'Genuine',
-    text: 'This code was issued by the brand through True Tag and looks normal.',
-    advice: 'Enjoy your product. Keep the pack if you want to report a problem later.',
+    text: 'Issued by the brand through True Tag. Looks normal.',
+    advice: '',
   },
   suspicious: {
     title: 'Suspicious',
-    text: 'This code is real, but it has been checked in a way that looks unusual.',
-    advice:
-      'Do not drink, smoke or give it to others until you are sure. Check where you bought it, compare the pack with a known genuine one, and report it to us.',
+    text: 'Real code, but unusual scans.',
+    advice: 'Do not drink or smoke it. Report it to us.',
   },
   invalid: {
     title: 'Not found',
-    text: 'We could not find this code. This does not prove the product is fake, but treat it with care.',
-    advice:
-      'Check you typed the code correctly. If it still fails, the product may not be registered with True Tag, or it may be counterfeit. Report it to us.',
+    text: 'We have no record of this code.',
+    advice: 'Check the code. Still failing? Treat with care and report it.',
   },
 };

@@ -47,37 +47,23 @@ const t = (k: string) => strings.en[k];
     <footer>
       <div class="wrap">
         <div class="cols">
+          <div><strong style="color:#fff">{site.name}</strong><p>{site.city}</p></div>
           <div>
-            <strong style="color:#fff">{site.name}</strong>
-            <p>Proving what's genuine, before the sale.</p><p>{site.city}</p>
-          </div>
-          <div>
-            <strong style="color:#fff">Explore</strong>
-            <ul>
-              <li><a href="/verify">How to verify</a></li>
-              <li><a href="/demo">Demo scan</a></li>
-              <li><a href="/brands">For brands</a></li>
-              <li><a href="/about">About</a></li>
-            </ul>
-          </div>
-          <div>
-            <strong style="color:#fff">Contact</strong>
             <ul>
               <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
               <li><a href={whatsappLink()}>WhatsApp us</a></li>
               <li>{site.address}</li>
-              <li><a href="/contact">Contact page</a></li>
             </ul>
           </div>
           <div>
-            <strong style="color:#fff">Legal</strong>
             <ul>
+              <li><a href="/contact">Contact</a></li>
               <li><a href="/privacy">Privacy policy</a></li>
               <li><a href="/terms">Terms</a></li>
             </ul>
           </div>
         </div>
-        <p style="margin-top:2rem;font-size:.85rem">&copy; 2026 {site.legalName}. All rights reserved.</p>
+        <p style="margin-top:2rem;font-size:.85rem">&copy; 2026 {site.legalName}</p>
       </div>
     </footer>
     <script define:vars={{ strings }}>
@@ -92,6 +78,50 @@ const t = (k: string) => strings.en[k];
       const saved = localStorage.getItem('tt-lang') || 'en';
       sel.value = saved; apply(saved);
       sel.addEventListener('change', () => { localStorage.setItem('tt-lang', sel.value); apply(sel.value); });
+    </script>
+  <script is:inline>
+      (function () {
+        var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var navWrap = document.querySelector('.nav-wrap');
+        var onScroll = function () { navWrap.classList.toggle('scrolled', scrollY > 20); };
+        addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+        var fmt = function (el, v) { el.textContent = (el.dataset.prefix || '') + Math.round(v) + (el.dataset.suffix || ''); };
+        var count = function (el) {
+          var end = +el.dataset.count;
+          if (reduce) return fmt(el, end);
+          var start = performance.now(), dur = 1400;
+          (function step(now) {
+            var p = Math.min((now - start) / dur, 1);
+            fmt(el, end * (1 - Math.pow(1 - p, 3)));
+            if (p < 1) requestAnimationFrame(step);
+          })(start);
+        };
+        var els = document.querySelectorAll('main .card, main .tile, main .steps li, main .timeline li, main .chips li, main h2, main .page-head > *, main .hero-grid > *, main .figure-wrap, main .cta-row');
+        if (!reduce && 'IntersectionObserver' in window) {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              e.target.classList.add('in');
+              e.target.querySelectorAll('[data-count]').forEach(count);
+              if (e.target.hasAttribute('data-count')) count(e.target);
+              io.unobserve(e.target);
+            });
+          }, { threshold: 0.15 });
+          els.forEach(function (el, i) {
+            var sibs = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
+            el.style.setProperty('--d', Math.min(sibs, 5) * 90 + 'ms');
+            el.classList.add('reveal'); io.observe(el);
+          });
+          setTimeout(function () {
+            els.forEach(function (el) {
+              if (!el.classList.contains('in') && el.getBoundingClientRect().top < innerHeight) el.classList.add('in');
+            });
+          }, 1200);
+        } else {
+          document.querySelectorAll('[data-count]').forEach(count);
+        }
+      })();
     </script>
   </body>
 </html>

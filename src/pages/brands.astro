@@ -1,55 +1,49 @@
 ---
 import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
 import { site, whatsappLink } from '../content/site';
 ---
 <Base title="For brands">
   <div class="wrap page-head">
-    <p class="eyebrow">For brands</p>
-    <h1>Protect your customers and your name</h1>
-    <p class="muted">Give every pack its own code. Know when and where it is checked. Act on fakes with evidence.</p>
-    <a class="btn" href="#pilot">Request a pilot</a>
-    <a class="btn ghost" href="/demo">Try the demo</a>
+    <h1>Protect your brand</h1>
+    <div class="cta-row">
+      <a class="btn" href="#pilot">Request a pilot</a>
+      <a class="btn ghost" href="/demo">Try the demo</a>
+    </div>
   </div>
   <section>
     <div class="wrap">
-      <h2>How a pilot works</h2>
-      <ol class="steps">
-        <li><strong>Learn.</strong> See how it works and the core benefits.</li>
-        <li><strong>Enquire.</strong> Send the pilot form or message us on WhatsApp.</li>
-        <li><strong>Pilot.</strong> One product, unique codes, first scans.</li>
-        <li><strong>Dashboard.</strong> Scans, flags and locations.</li>
+      <ol class="timeline">
+        <li><strong>Enquire</strong><span class="muted">Form or WhatsApp</span></li>
+        <li><strong>Pilot</strong><span class="muted">One product, first scans</span></li>
+        <li><strong>Dashboard</strong><span class="muted">Scans, flags, places</span></li>
+        <li><strong>Act</strong><span class="muted">Evidence on fakes</span></li>
       </ol>
     </div>
   </section>
   <section class="band">
-    <div class="wrap">
-      <h2>Reports your team gets</h2>
-      <div class="grid two" style="margin-top:1.5rem">
-        <div><h3>Scan summary</h3><p class="muted">Genuine, suspicious and invalid split by product, batch, province and channel.</p></div>
-        <div><h3>Suspicious activity list</h3><p class="muted">Flagged batches and codes with the reason, place, time and status.</p></div>
-        <div><h3>Consumer reports inbox</h3><p class="muted">Shopper reports of suspected fakes. You set the status and the shopper is thanked.</p></div>
-        <div><h3>Monthly PDF summary</h3><p class="muted">Five headline numbers, top three findings and suggested actions.</p></div>
-      </div>
-      <p class="muted" style="margin-top:1.5rem">Plans and pricing are shared during your pilot conversation.</p>
+    <div class="wrap grid three" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="chart" /></span><h3>Scan summary</h3></div>
+      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="flag" /></span><h3>Suspicious activity</h3></div>
+      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="inbox" /></span><h3>Consumer reports</h3></div>
+      <div class="tile"><span class="ico" style="background:rgba(255,255,255,.12)"><Icon name="pdf" /></span><h3>Monthly PDF</h3></div>
     </div>
   </section>
   <section id="pilot">
     <div class="wrap grid two">
       <div>
         <h2>Request a pilot</h2>
-        <p class="muted">Tell us about your product. We reply by email, or you can message us directly on WhatsApp.</p>
-        <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire about a pilot.')}>WhatsApp enquiry</a>
+        <a class="btn ghost" href={whatsappLink('Hi True Tag, I am a brand and I would like to enquire about a pilot.')}>WhatsApp us</a>
       </div>
       <form class="pilot card" id="pilot-form">
-        <label>Company name<input name="company" required /></label>
+        <label>Company<input name="company" required /></label>
         <label>Your name<input name="name" required /></label>
         <label>Email<input name="email" type="email" required /></label>
-        <label>Product type
+        <label>Product
           <select name="type"><option>Alcohol</option><option>Cigarettes</option><option>Other</option></select>
         </label>
-        <label>Tell us more<textarea name="msg" rows="3"></textarea></label>
-        <button class="btn" type="submit">Send request</button>
-        <p class="muted" style="font-size:.85rem;margin:0">This opens your email app with the details filled in. We only use them to reply to you.</p>
+        <label>Message<textarea name="msg" rows="3"></textarea></label>
+        <button class="btn" type="submit">Send</button>
       </form>
     </div>
   </section>
